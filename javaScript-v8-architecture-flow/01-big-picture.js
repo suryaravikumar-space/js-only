@@ -6,6 +6,42 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  🎤 1-2 MINUTE INTERVIEW EXPLANATION                                         ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                              ║
+ * ║  "When you run `node file.js`, here's what happens step by step:             ║
+ * ║                                                                              ║
+ * ║  First, Node.js starts up and initializes two key components - the V8       ║
+ * ║  JavaScript engine and libuv for async I/O.                                  ║
+ * ║                                                                              ║
+ * ║  Then your code goes through a PIPELINE:                                     ║
+ * ║                                                                              ║
+ * ║  1. FILE READ: Code is read as a string and wrapped in a function that      ║
+ * ║     provides exports, require, module, __filename, and __dirname.           ║
+ * ║                                                                              ║
+ * ║  2. PARSING: The Lexer tokenizes code into keywords, identifiers,           ║
+ * ║     operators. Then the Parser builds an Abstract Syntax Tree.              ║
+ * ║                                                                              ║
+ * ║  3. COMPILATION: Ignition interpreter converts AST to bytecode for          ║
+ * ║     fast startup. Hot code that runs repeatedly gets optimized by           ║
+ * ║     TurboFan into machine code for maximum speed.                           ║
+ * ║                                                                              ║
+ * ║  4. EXECUTION: Code runs in execution contexts with variable hoisting,      ║
+ * ║     scope chain, and 'this' binding. The call stack tracks function calls.  ║
+ * ║                                                                              ║
+ * ║  5. ASYNC: The event loop processes async callbacks - microtasks like       ║
+ * ║     Promises have higher priority than macrotasks like setTimeout.          ║
+ * ║                                                                              ║
+ * ║  Memory is managed automatically - Stack for primitives, Heap for objects,  ║
+ * ║  with garbage collection cleaning up unreachable objects.                   ║
+ * ║                                                                              ║
+ * ║  This architecture gives JavaScript fast startup AND fast execution for     ║
+ * ║  hot code paths, which is why V8 powers Chrome, Node.js, and Electron."     ║
+ * ║                                                                              ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
  * ┌──────────────────────────────────────────────────────────────────────────────┐
  * │ WHAT IS V8?                                                                  │
  * └──────────────────────────────────────────────────────────────────────────────┘

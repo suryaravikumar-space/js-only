@@ -6,6 +6,44 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  🎤 1-2 MINUTE INTERVIEW EXPLANATION                                         ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                              ║
+ * ║  "JavaScript is SINGLE-THREADED but handles async operations through         ║
+ * ║  the EVENT LOOP. Here's how it works:                                        ║
+ * ║                                                                              ║
+ * ║  THE ARCHITECTURE:                                                           ║
+ * ║  1. CALL STACK - where synchronous code executes                             ║
+ * ║  2. WEB APIs/NODE APIs - setTimeout, fetch, fs run in separate threads       ║
+ * ║  3. CALLBACK QUEUES - completed async callbacks wait here                    ║
+ * ║  4. EVENT LOOP - moves callbacks to call stack when it's empty               ║
+ * ║                                                                              ║
+ * ║  TWO TYPES OF CALLBACKS:                                                     ║
+ * ║                                                                              ║
+ * ║  MICROTASKS (High Priority):                                                 ║
+ * ║  - Promise.then/catch/finally                                                ║
+ * ║  - queueMicrotask()                                                          ║
+ * ║  - process.nextTick (Node.js - highest priority!)                            ║
+ * ║  - ALL microtasks run before next macrotask                                  ║
+ * ║                                                                              ║
+ * ║  MACROTASKS (Normal Priority):                                               ║
+ * ║  - setTimeout, setInterval                                                   ║
+ * ║  - I/O callbacks                                                             ║
+ * ║  - ONE macrotask per event loop iteration                                    ║
+ * ║                                                                              ║
+ * ║  EXECUTION ORDER:                                                            ║
+ * ║  1. Run all synchronous code                                                 ║
+ * ║  2. Run ALL microtasks                                                       ║
+ * ║  3. Run ONE macrotask                                                        ║
+ * ║  4. Repeat                                                                   ║
+ * ║                                                                              ║
+ * ║  So for: sync → setTimeout → Promise → sync                                  ║
+ * ║  Output: sync, sync, Promise (microtask), setTimeout (macrotask)"            ║
+ * ║                                                                              ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
  * ┌──────────────────────────────────────────────────────────────────────────────┐
  * │ WHY EVENT LOOP?                                                              │
  * └──────────────────────────────────────────────────────────────────────────────┘

@@ -6,6 +6,42 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  🎤 1-2 MINUTE INTERVIEW EXPLANATION                                         ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                              ║
+ * ║  "When JavaScript code runs, V8 creates EXECUTION CONTEXTS:                  ║
+ * ║                                                                              ║
+ * ║  An Execution Context contains three things:                                 ║
+ * ║  1. Variable Environment - stores var declarations and functions             ║
+ * ║  2. Lexical Environment - stores let/const and reference to outer scope     ║
+ * ║  3. This Binding - the value of 'this' keyword                               ║
+ * ║                                                                              ║
+ * ║  TWO PHASES:                                                                 ║
+ * ║  CREATION PHASE (before code runs):                                          ║
+ * ║  - Function declarations are fully hoisted                                   ║
+ * ║  - var declarations hoisted with value 'undefined'                           ║
+ * ║  - let/const are in Temporal Dead Zone (exist but uninitialized)            ║
+ * ║                                                                              ║
+ * ║  EXECUTION PHASE: Code runs line by line, values assigned                    ║
+ * ║                                                                              ║
+ * ║  CALL STACK:                                                                 ║
+ * ║  Each function call creates a new execution context pushed onto the stack.   ║
+ * ║  When function returns, its context is popped off.                           ║
+ * ║                                                                              ║
+ * ║  SCOPE CHAIN:                                                                ║
+ * ║  When V8 looks up a variable, it searches: Current Scope → Outer Scope →    ║
+ * ║  Global Scope. This chain is determined by WHERE code is written             ║
+ * ║  (lexical scoping), not where it's called from.                              ║
+ * ║                                                                              ║
+ * ║  THIS BINDING - determined by HOW function is called:                        ║
+ * ║  - obj.method() → this = obj                                                 ║
+ * ║  - new Func() → this = new object                                            ║
+ * ║  - Arrow functions → inherit this from enclosing scope"                      ║
+ * ║                                                                              ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
  * ┌──────────────────────────────────────────────────────────────────────────────┐
  * │ EXECUTION CONTEXT                                                            │
  * └──────────────────────────────────────────────────────────────────────────────┘

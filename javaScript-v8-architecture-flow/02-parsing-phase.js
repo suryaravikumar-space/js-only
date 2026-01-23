@@ -6,6 +6,41 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  🎤 1-2 MINUTE INTERVIEW EXPLANATION                                         ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                              ║
+ * ║  "The parsing phase converts source code into a structure V8 can work with. ║
+ * ║  It has two main steps:                                                      ║
+ * ║                                                                              ║
+ * ║  STEP 1 - LEXICAL ANALYSIS (Tokenization):                                   ║
+ * ║  The Lexer reads code character by character and groups them into TOKENS.   ║
+ * ║  For example, `var x = 10;` becomes 5 tokens:                                ║
+ * ║    - KEYWORD: 'var'                                                          ║
+ * ║    - IDENTIFIER: 'x'                                                         ║
+ * ║    - OPERATOR: '='                                                           ║
+ * ║    - NUMBER: '10'                                                            ║
+ * ║    - PUNCTUATOR: ';'                                                         ║
+ * ║                                                                              ║
+ * ║  STEP 2 - SYNTAX ANALYSIS (AST Generation):                                  ║
+ * ║  The Parser takes tokens and builds an Abstract Syntax Tree.                 ║
+ * ║  AST is a tree representing code structure and meaning.                      ║
+ * ║                                                                              ║
+ * ║  For `2 + 3 * 4`, the AST correctly shows * has higher precedence:           ║
+ * ║  The tree structure ensures 3*4 is computed first, then added to 2.         ║
+ * ║                                                                              ║
+ * ║  WHY THIS MATTERS:                                                           ║
+ * ║  - AST handles operator precedence correctly                                 ║
+ * ║  - AST is input for the next stage (Ignition bytecode generation)           ║
+ * ║  - Parsing errors (SyntaxError) are caught at this stage                     ║
+ * ║  - V8 uses 'lazy parsing' - only fully parses code when needed               ║
+ * ║                                                                              ║
+ * ║  Tools like Babel and ESLint work by manipulating ASTs - they parse          ║
+ * ║  your code, transform the tree, then generate new code from it."             ║
+ * ║                                                                              ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
  * ┌──────────────────────────────────────────────────────────────────────────────┐
  * │ 2.1 LEXICAL ANALYSIS (TOKENIZATION)                                          │
  * └──────────────────────────────────────────────────────────────────────────────┘

@@ -6,6 +6,40 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  🎤 1-2 MINUTE INTERVIEW EXPLANATION                                         ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                              ║
+ * ║  "V8 uses two key techniques for fast property access:                       ║
+ * ║                                                                              ║
+ * ║  HIDDEN CLASSES (also called Maps or Shapes):                                ║
+ * ║  - V8 creates hidden classes to describe object structure                    ║
+ * ║  - Objects with same properties in same order share the same hidden class    ║
+ * ║  - This enables fast property access via OFFSETS instead of hash lookups     ║
+ * ║                                                                              ║
+ * ║  Example: If you create 1000 Points with `this.x = x; this.y = y;`           ║
+ * ║  they all share ONE hidden class. V8 knows 'x' is always at offset 0,        ║
+ * ║  'y' at offset 1 - direct memory access, very fast!                          ║
+ * ║                                                                              ║
+ * ║  INLINE CACHING (IC):                                                        ║
+ * ║  - V8 caches property access information at each call site                   ║
+ * ║  - MONOMORPHIC: Always same shape = FASTEST (cached lookup)                  ║
+ * ║  - POLYMORPHIC: 2-4 shapes = SLOWER (checks a few cached shapes)             ║
+ * ║  - MEGAMORPHIC: Many shapes = SLOWEST (falls back to hash table)             ║
+ * ║                                                                              ║
+ * ║  BEST PRACTICES:                                                             ║
+ * ║  - Initialize ALL properties in constructor                                  ║
+ * ║  - Keep property order consistent                                            ║
+ * ║  - DON'T delete properties (changes hidden class)                            ║
+ * ║  - DON'T add properties after creation                                       ║
+ * ║  - Keep function argument types consistent (type stability)                  ║
+ * ║  - Use object literals { x: 1, y: 2 } over incremental assignment            ║
+ * ║                                                                              ║
+ * ║  These patterns help V8 optimize your code and avoid deoptimization."        ║
+ * ║                                                                              ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
  * ┌──────────────────────────────────────────────────────────────────────────────┐
  * │ HIDDEN CLASSES (Maps/Shapes)                                                 │
  * └──────────────────────────────────────────────────────────────────────────────┘

@@ -6,6 +6,39 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  🎤 1-2 MINUTE INTERVIEW EXPLANATION                                         ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                              ║
+ * ║  "V8 uses JIT - Just-In-Time compilation - which combines the benefits       ║
+ * ║  of both interpreters and compilers:                                         ║
+ * ║                                                                              ║
+ * ║  IGNITION (The Interpreter):                                                 ║
+ * ║  - Takes the AST and converts it to BYTECODE                                 ║
+ * ║  - Bytecode is compact and platform-neutral                                  ║
+ * ║  - Executes code immediately for fast startup                                ║
+ * ║  - While running, it collects TYPE FEEDBACK - tracking what types            ║
+ * ║    each function actually receives                                           ║
+ * ║                                                                              ║
+ * ║  TURBOFAN (The Optimizing Compiler):                                         ║
+ * ║  - Monitors for 'HOT' code - functions called thousands of times            ║
+ * ║  - Uses type feedback to make assumptions                                    ║
+ * ║  - Generates highly optimized MACHINE CODE                                   ║
+ * ║  - Applies optimizations like function inlining, constant folding,           ║
+ * ║    dead code elimination                                                     ║
+ * ║                                                                              ║
+ * ║  DEOPTIMIZATION:                                                             ║
+ * ║  If TurboFan's assumptions are violated - like a function optimized          ║
+ * ║  for numbers suddenly receives a string - V8 'bails out' and falls           ║
+ * ║  back to the slower bytecode version.                                        ║
+ * ║                                                                              ║
+ * ║  This is why TYPE STABILITY matters for performance - if you always          ║
+ * ║  pass numbers to a function, TurboFan can optimize it aggressively.          ║
+ * ║  Mixing types causes deoptimization and slower execution."                   ║
+ * ║                                                                              ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
  * ┌──────────────────────────────────────────────────────────────────────────────┐
  * │ INTERPRETER vs COMPILER vs JIT                                               │
  * └──────────────────────────────────────────────────────────────────────────────┘

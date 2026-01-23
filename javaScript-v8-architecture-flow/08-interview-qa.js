@@ -8,6 +8,47 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  🎤 MASTER 2-MINUTE INTERVIEW EXPLANATION (Full V8 Pipeline)                 ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                              ║
+ * ║  "Let me walk you through exactly what happens when you run `node file.js`: ║
+ * ║                                                                              ║
+ * ║  STARTUP:                                                                    ║
+ * ║  Node.js initializes V8 (the JavaScript engine) and libuv (for async I/O).  ║
+ * ║  Your code is read as a string and wrapped in a function that provides      ║
+ * ║  exports, require, module, __filename, and __dirname.                        ║
+ * ║                                                                              ║
+ * ║  PARSING:                                                                    ║
+ * ║  The Lexer tokenizes code into keywords, identifiers, operators.             ║
+ * ║  The Parser builds an Abstract Syntax Tree representing code structure.      ║
+ * ║                                                                              ║
+ * ║  COMPILATION (JIT):                                                          ║
+ * ║  Ignition interpreter converts AST to bytecode for fast startup.             ║
+ * ║  While running, it collects type feedback - 'this function gets numbers'.   ║
+ * ║  Hot code (called 1000+ times) is optimized by TurboFan into machine code.   ║
+ * ║  If type assumptions break, code deoptimizes back to bytecode.               ║
+ * ║                                                                              ║
+ * ║  EXECUTION:                                                                  ║
+ * ║  Code runs in execution contexts with hoisting, scope chain, this binding.   ║
+ * ║  Call stack tracks function calls. Each call pushes a new context.           ║
+ * ║                                                                              ║
+ * ║  MEMORY:                                                                     ║
+ * ║  Stack holds primitives and references. Heap holds objects.                  ║
+ * ║  Garbage collector uses Scavenger for young objects, Mark-Sweep for old.     ║
+ * ║                                                                              ║
+ * ║  ASYNC (Event Loop):                                                         ║
+ * ║  Single-threaded but non-blocking via event loop.                            ║
+ * ║  Microtasks (Promises) have priority over macrotasks (setTimeout).           ║
+ * ║  Process exits when event loop queue is empty.                               ║
+ * ║                                                                              ║
+ * ║  OPTIMIZATION:                                                               ║
+ * ║  Hidden classes enable fast property access. Inline caching remembers        ║
+ * ║  object shapes. Keep types consistent for best performance."                 ║
+ * ║                                                                              ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
  * ┌──────────────────────────────────────────────────────────────────────────────┐
  * │ Q1: What is V8?                                                              │
  * └──────────────────────────────────────────────────────────────────────────────┘

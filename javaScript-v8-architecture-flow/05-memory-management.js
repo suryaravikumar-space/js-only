@@ -6,6 +6,44 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  *
  *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  🎤 1-2 MINUTE INTERVIEW EXPLANATION                                         ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                              ║
+ * ║  "JavaScript memory is divided into STACK and HEAP:                          ║
+ * ║                                                                              ║
+ * ║  STACK:                                                                      ║
+ * ║  - Stores primitives (numbers, strings, booleans) directly                   ║
+ * ║  - Stores REFERENCES (pointers) to objects                                   ║
+ * ║  - Stores function call frames                                               ║
+ * ║  - Fixed size (~1MB), very fast, automatically cleaned (LIFO)               ║
+ * ║                                                                              ║
+ * ║  HEAP:                                                                       ║
+ * ║  - Stores objects, arrays, functions, closures                               ║
+ * ║  - Dynamic size, slower access                                               ║
+ * ║  - Managed by GARBAGE COLLECTOR                                              ║
+ * ║                                                                              ║
+ * ║  V8's GARBAGE COLLECTION uses the generational hypothesis -                  ║
+ * ║  'most objects die young':                                                   ║
+ * ║                                                                              ║
+ * ║  NEW SPACE (Young Generation):                                               ║
+ * ║  - New objects are allocated here                                            ║
+ * ║  - SCAVENGER runs frequently, very fast (1-2ms)                              ║
+ * ║  - Uses semi-space copying: FROM space → TO space                            ║
+ * ║  - Objects surviving 2+ scavenges are promoted to Old Space                  ║
+ * ║                                                                              ║
+ * ║  OLD SPACE (Old Generation):                                                 ║
+ * ║  - Long-lived objects                                                        ║
+ * ║  - MARK-SWEEP: Mark reachable objects from roots, sweep unmarked             ║
+ * ║  - MARK-COMPACT: Defragments memory when needed                              ║
+ * ║  - Slower but less frequent                                                  ║
+ * ║                                                                              ║
+ * ║  MEMORY LEAKS happen when objects stay reachable unintentionally -           ║
+ * ║  global variables, forgotten timers, closures holding large data."           ║
+ * ║                                                                              ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
  * ┌──────────────────────────────────────────────────────────────────────────────┐
  * │ STACK vs HEAP                                                                │
  * └──────────────────────────────────────────────────────────────────────────────┘

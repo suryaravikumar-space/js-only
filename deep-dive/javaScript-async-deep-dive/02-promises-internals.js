@@ -1,0 +1,971 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║                                                                              ║
+ * ║                    JAVASCRIPT ASYNC DEEP DIVE                                ║
+ * ║                 PART 2: PROMISES - INTERNALS & MECHANICS                     ║
+ * ║                                                                              ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║  🎤 1-2 MINUTE INTERVIEW EXPLANATION                                         ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                              ║
+ * ║  "A Promise is an object representing the eventual completion or failure    ║
+ * ║   of an asynchronous operation. It's JavaScript's solution to callback hell.║
+ * ║                                                                              ║
+ * ║   A Promise has THREE states:                                                ║
+ * ║   1. PENDING - initial state, operation in progress                         ║
+ * ║   2. FULFILLED - operation completed successfully (has a value)             ║
+ * ║   3. REJECTED - operation failed (has a reason/error)                       ║
+ * ║                                                                              ║
+ * ║   Once a Promise is SETTLED (fulfilled or rejected), it CANNOT change state.║
+ * ║   This is a key guarantee - unlike callbacks that could be called multiple  ║
+ * ║   times, a Promise resolves or rejects exactly ONCE.                        ║
+ * ║                                                                              ║
+ * ║   We use .then() for success, .catch() for errors, and .finally() for       ║
+ * ║   cleanup. The magic is CHAINING - each .then() returns a NEW Promise,      ║
+ * ║   allowing us to write flat, readable async code instead of nested callbacks║
+ * ║                                                                              ║
+ * ║   Internally, Promises use the MICROTASK QUEUE, which has higher priority   ║
+ * ║   than the regular task queue. Promise callbacks run BEFORE setTimeout      ║
+ * ║   callbacks, even if setTimeout has 0ms delay."                             ║
+ * ║                                                                              ║
+ * ║  KEY POINTS TO MENTION:                                                      ║
+ * ║  • Three states: pending → fulfilled/rejected                                ║
+ * ║  • Immutable once settled (can't change from fulfilled to rejected)         ║
+ * ║  • .then() returns a NEW Promise (enables chaining)                         ║
+ * ║  • Microtask queue priority (higher than setTimeout)                        ║
+ * ║  • Solves callback hell with flat chaining                                   ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
+ *
+ * ┌──────────────────────────────────────────────────────────────────────────────┐
+ * │ PROMISE STATE MACHINE - COMPLETE VISUAL                                      │
+ * └──────────────────────────────────────────────────────────────────────────────┘
+ *
+ *
+ *   ┌─────────────────────────────────────────────────────────────────────────────┐
+ *   │                      PROMISE LIFECYCLE                                      │
+ *   ├─────────────────────────────────────────────────────────────────────────────┤
+ *   │                                                                             │
+ *   │                                                                             │
+ *   │                      ┌─────────────────┐                                    │
+ *   │                      │                 │                                    │
+ *   │                      │    PENDING      │◀─── Initial state                  │
+ *   │                      │                 │     (Promise created)              │
+ *   │                      │  • No value yet │                                    │
+ *   │                      │  • Waiting...   │                                    │
+ *   │                      │                 │                                    │
+ *   │                      └────────┬────────┘                                    │
+ *   │                               │                                             │
+ *   │               ┌───────────────┴───────────────┐                             │
+ *   │               │                               │                             │
+ *   │          resolve(value)                  reject(reason)                     │
+ *   │               │                               │                             │
+ *   │               ▼                               ▼                             │
+ *   │    ┌─────────────────────┐       ┌─────────────────────┐                    │
+ *   │    │                     │       │                     │                    │
+ *   │    │     FULFILLED       │       │      REJECTED       │                    │
+ *   │    │                     │       │                     │                    │
+ *   │    │  • Has value        │       │  • Has reason       │                    │
+ *   │    │  • Success!         │       │  • Error/failure    │                    │
+ *   │    │  • .then() called   │       │  • .catch() called  │                    │
+ *   │    │                     │       │                     │                    │
+ *   │    └─────────────────────┘       └─────────────────────┘                    │
+ *   │              │                             │                                │
+ *   │              └──────────────┬──────────────┘                                │
+ *   │                             │                                               │
+ *   │                             ▼                                               │
+ *   │                    ╔═══════════════════╗                                    │
+ *   │                    ║  SETTLED          ║                                    │
+ *   │                    ║  (IMMUTABLE!)     ║                                    │
+ *   │                    ║                   ║                                    │
+ *   │                    ║  Cannot change    ║                                    │
+ *   │                    ║  state anymore!   ║                                    │
+ *   │                    ╚═══════════════════╝                                    │
+ *   │                                                                             │
+ *   └─────────────────────────────────────────────────────────────────────────────┘
+ *
+ *
+ *
+ * ┌──────────────────────────────────────────────────────────────────────────────┐
+ * │ PROMISE vs CALLBACK ARCHITECTURE                                             │
+ * └──────────────────────────────────────────────────────────────────────────────┘
+ *
+ *
+ *   CALLBACK APPROACH (Inversion of Control):
+ *   ══════════════════════════════════════════════════════════════════════════════
+ *
+ *   ┌─────────────────┐        ┌─────────────────┐
+ *   │   Your Code     │───────▶│  Library Code   │
+ *   │                 │        │                 │
+ *   │  doSomething(   │        │  // They call   │
+ *   │    callback     │◀───────│  // YOUR func   │
+ *   │  )              │        │  callback()     │
+ *   │                 │        │  callback()  ?  │  ← What if called twice?
+ *   │  // You give    │        │  // never?   ?  │  ← What if never called?
+ *   │  // control     │        │                 │
+ *   └─────────────────┘        └─────────────────┘
+ *
+ *   Problem: You trust library to call your callback correctly!
+ *
+ *
+ *   PROMISE APPROACH (You stay in control):
+ *   ══════════════════════════════════════════════════════════════════════════════
+ *
+ *   ┌─────────────────┐        ┌─────────────────┐
+ *   │   Your Code     │───────▶│  Library Code   │
+ *   │                 │        │                 │
+ *   │  promise =      │◀───────│  return         │
+ *   │   doSomething() │        │    Promise      │
+ *   │                 │        │                 │
+ *   │  promise        │        │  resolve() or   │
+ *   │    .then(...)   │        │  reject() once  │
+ *   │    .catch(...)  │        │                 │
+ *   │                 │        │                 │
+ *   │  // YOU decide  │        │  // Guaranteed  │
+ *   │  // what to do  │        │  // once only!  │
+ *   └─────────────────┘        └─────────────────┘
+ *
+ *   Solution: Promise guarantees single resolution!
+ *
+ *
+ *
+ * ┌──────────────────────────────────────────────────────────────────────────────┐
+ * │ PROMISE CHAINING - EXECUTION FLOW                                            │
+ * └──────────────────────────────────────────────────────────────────────────────┘
+ *
+ *
+ *   Promise.resolve(1)
+ *       .then(x => x + 1)
+ *       .then(x => x * 2)
+ *       .then(x => console.log(x));
+ *
+ *
+ *   STEP-BY-STEP EXECUTION:
+ *
+ *   Step 1: Promise.resolve(1)
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   ┌──────────────────────────┐
+ *   │  Promise 1               │
+ *   │  State: FULFILLED        │
+ *   │  Value: 1                │
+ *   └────────────┬─────────────┘
+ *                │
+ *                ▼ .then(x => x + 1)
+ *
+ *
+ *   Step 2: First .then() - Creates NEW Promise
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   ┌──────────────────────────┐     ┌──────────────────────────┐
+ *   │  Promise 1               │     │  Promise 2 (NEW!)        │
+ *   │  State: FULFILLED        │────▶│  State: PENDING          │
+ *   │  Value: 1                │     │  Waiting for callback... │
+ *   └──────────────────────────┘     └────────────┬─────────────┘
+ *                                                  │
+ *                                    callback queued to microtask
+ *                                                  │
+ *                                                  ▼
+ *                                    ┌──────────────────────────┐
+ *                                    │  Microtask Queue:        │
+ *                                    │  [x => x + 1]            │
+ *                                    └──────────────────────────┘
+ *
+ *
+ *   Step 3: Microtask executes, Promise 2 resolves
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   ┌──────────────────────────┐     ┌──────────────────────────┐
+ *   │  Promise 1               │     │  Promise 2               │
+ *   │  State: FULFILLED        │     │  State: FULFILLED        │
+ *   │  Value: 1                │     │  Value: 2  (1 + 1)       │
+ *   └──────────────────────────┘     └────────────┬─────────────┘
+ *                                                  │
+ *                                                  ▼ .then(x => x * 2)
+ *
+ *
+ *   Step 4: Second .then() - Creates Promise 3
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   ┌────────────┐     ┌────────────┐     ┌──────────────────────────┐
+ *   │ Promise 1  │     │ Promise 2  │     │  Promise 3 (NEW!)        │
+ *   │ Value: 1   │     │ Value: 2   │────▶│  State: PENDING          │
+ *   └────────────┘     └────────────┘     └────────────┬─────────────┘
+ *                                                       │
+ *                                                       ▼
+ *                                         ┌──────────────────────────┐
+ *                                         │  Microtask Queue:        │
+ *                                         │  [x => x * 2]            │
+ *                                         └──────────────────────────┘
+ *
+ *
+ *   Step 5: Final state
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   ┌────────────┐     ┌────────────┐     ┌────────────┐     ┌────────────┐
+ *   │ Promise 1  │     │ Promise 2  │     │ Promise 3  │     │ Promise 4  │
+ *   │ Value: 1   │────▶│ Value: 2   │────▶│ Value: 4   │────▶│ (console)  │
+ *   └────────────┘     └────────────┘     └────────────┘     └────────────┘
+ *
+ *   OUTPUT: 4
+ *
+ *
+ *
+ * ┌──────────────────────────────────────────────────────────────────────────────┐
+ * │ MICROTASK QUEUE vs MACROTASK QUEUE                                           │
+ * └──────────────────────────────────────────────────────────────────────────────┘
+ *
+ *
+ *   ╔════════════════════════════════════════════════════════════════════════════╗
+ *   ║                         EVENT LOOP QUEUES                                  ║
+ *   ╠════════════════════════════════════════════════════════════════════════════╣
+ *   ║                                                                            ║
+ *   ║   ┌────────────────────────────────────────────────────────────────────┐   ║
+ *   ║   │                    CALL STACK                                      │   ║
+ *   ║   │                                                                    │   ║
+ *   ║   │   When empty, event loop checks queues...                          │   ║
+ *   ║   └─────────────────────────────┬──────────────────────────────────────┘   ║
+ *   ║                                 │                                          ║
+ *   ║                                 ▼                                          ║
+ *   ║                    ┌─────────────────────────┐                             ║
+ *   ║                    │      EVENT LOOP         │                             ║
+ *   ║                    │                         │                             ║
+ *   ║                    │  1. Check Microtasks    │ ◀── FIRST! (Higher Priority)║
+ *   ║                    │  2. Check Macrotasks    │ ◀── SECOND (Lower Priority) ║
+ *   ║                    └─────────────────────────┘                             ║
+ *   ║                        │               │                                   ║
+ *   ║            ┌───────────┘               └───────────┐                       ║
+ *   ║            ▼                                       ▼                       ║
+ *   ║   ╔═══════════════════════════╗      ┌─────────────────────────────┐       ║
+ *   ║   ║    MICROTASK QUEUE        ║      │      MACROTASK QUEUE        │       ║
+ *   ║   ║    (Higher Priority)      ║      │      (Lower Priority)       │       ║
+ *   ║   ╠═══════════════════════════╣      ├─────────────────────────────┤       ║
+ *   ║   ║                           ║      │                             │       ║
+ *   ║   ║  • Promise.then()         ║      │  • setTimeout()             │       ║
+ *   ║   ║  • Promise.catch()        ║      │  • setInterval()            │       ║
+ *   ║   ║  • Promise.finally()      ║      │  • setImmediate() (Node)    │       ║
+ *   ║   ║  • queueMicrotask()       ║      │  • I/O callbacks            │       ║
+ *   ║   ║  • MutationObserver       ║      │  • UI rendering             │       ║
+ *   ║   ║                           ║      │                             │       ║
+ *   ║   ╚═══════════════════════════╝      └─────────────────────────────┘       ║
+ *   ║                                                                            ║
+ *   ║   ═══════════════════════════════════════════════════════════════════════  ║
+ *   ║   RULE: ALL microtasks run before ANY macrotask!                           ║
+ *   ║   ═══════════════════════════════════════════════════════════════════════  ║
+ *   ║                                                                            ║
+ *   ╚════════════════════════════════════════════════════════════════════════════╝
+ *
+ *
+ *
+ * ┌──────────────────────────────────────────────────────────────────────────────┐
+ * │ PROMISE EXECUTION ORDER - STEP BY STEP                                       │
+ * └──────────────────────────────────────────────────────────────────────────────┘
+ *
+ *   Code:
+ *   console.log('1');
+ *   setTimeout(() => console.log('2'), 0);
+ *   Promise.resolve().then(() => console.log('3'));
+ *   console.log('4');
+ *
+ *
+ *   STEP 1: Execute console.log('1')
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   Call Stack               Microtask Q         Macrotask Q         Output
+ *   ┌───────────────┐       ┌──────────┐        ┌──────────┐        ┌──────┐
+ *   │console.log(1) │       │ (empty)  │        │ (empty)  │        │ 1    │
+ *   │ main()        │       │          │        │          │        │      │
+ *   └───────────────┘       └──────────┘        └──────────┘        └──────┘
+ *
+ *
+ *   STEP 2: Execute setTimeout - adds to Macrotask Queue
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   Call Stack               Microtask Q         Macrotask Q         Output
+ *   ┌───────────────┐       ┌──────────┐        ┌──────────┐        ┌──────┐
+ *   │ setTimeout()  │──────▶│ (empty)  │        │ log('2') │        │ 1    │
+ *   │ main()        │       │          │        │          │        │      │
+ *   └───────────────┘       └──────────┘        └──────────┘        └──────┘
+ *
+ *
+ *   STEP 3: Execute Promise.resolve().then() - adds to Microtask Queue
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   Call Stack               Microtask Q         Macrotask Q         Output
+ *   ┌───────────────┐       ┌──────────┐        ┌──────────┐        ┌──────┐
+ *   │ .then()       │──────▶│ log('3') │        │ log('2') │        │ 1    │
+ *   │ main()        │       │          │        │          │        │      │
+ *   └───────────────┘       └──────────┘        └──────────┘        └──────┘
+ *
+ *
+ *   STEP 4: Execute console.log('4')
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   Call Stack               Microtask Q         Macrotask Q         Output
+ *   ┌───────────────┐       ┌──────────┐        ┌──────────┐        ┌──────┐
+ *   │console.log(4) │       │ log('3') │        │ log('2') │        │ 1, 4 │
+ *   │ main()        │       │          │        │          │        │      │
+ *   └───────────────┘       └──────────┘        └──────────┘        └──────┘
+ *
+ *
+ *   STEP 5: Stack empty - Process MICROTASKS first!
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   Call Stack               Microtask Q         Macrotask Q         Output
+ *   ┌───────────────┐       ┌──────────┐        ┌──────────┐        ┌────────┐
+ *   │console.log(3) │◀──────│ (empty)  │        │ log('2') │        │ 1,4,3  │
+ *   └───────────────┘       └──────────┘        └──────────┘        └────────┘
+ *
+ *
+ *   STEP 6: Microtasks done - Now process MACROTASKS
+ *   ═══════════════════════════════════════════════════════════════════════════════
+ *
+ *   Call Stack               Microtask Q         Macrotask Q         Output
+ *   ┌───────────────┐       ┌──────────┐        ┌──────────┐        ┌──────────┐
+ *   │console.log(2) │◀──────│ (empty)  │────────│ (empty)  │        │ 1,4,3,2 │
+ *   └───────────────┘       └──────────┘        └──────────┘        └──────────┘
+ *
+ *
+ *   FINAL OUTPUT: 1, 4, 3, 2
+ *   (NOT 1, 2, 3, 4!)
+ *
+ *
+ */
+
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SECTION 1: CREATING PROMISES
+// ════════════════════════════════════════════════════════════════════════════════
+
+console.log("═══ SECTION 1: CREATING PROMISES ═══\n");
+
+/**
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │ PROMISE CONSTRUCTOR                                                         │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ *
+ *   new Promise((resolve, reject) => {
+ *       │            │       │
+ *       │            │       └── Function to call on failure
+ *       │            └────────── Function to call on success
+ *       └─────────────────────── EXECUTOR (runs IMMEDIATELY!)
+ *   });
+ */
+
+console.log("1. Before Promise constructor");
+
+const myPromise = new Promise((resolve, reject) => {
+    console.log("2. Inside executor (SYNCHRONOUS!)");
+
+    // Simulate async operation
+    setTimeout(() => {
+        const success = true;
+        if (success) {
+            resolve("Operation successful!");
+        } else {
+            reject(new Error("Operation failed!"));
+        }
+    }, 100);
+});
+
+console.log("3. After Promise constructor");
+
+// Output: 1, 2, 3 (executor runs IMMEDIATELY, not async!)
+
+myPromise.then(value => console.log("4. Promise resolved:", value));
+
+
+// ─────────────────────────────────────────────────────────────────────────────────
+// Quick ways to create Promises
+// ─────────────────────────────────────────────────────────────────────────────────
+
+// Already resolved Promise
+const resolved = Promise.resolve("Already done!");
+resolved.then(v => console.log("Resolved:", v));
+
+// Already rejected Promise
+const rejected = Promise.reject(new Error("Already failed!"));
+rejected.catch(e => console.log("Rejected:", e.message));
+
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SECTION 2: PROMISE IMMUTABILITY
+// ════════════════════════════════════════════════════════════════════════════════
+
+console.log("\n═══ SECTION 2: PROMISE IMMUTABILITY ═══\n");
+
+/**
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │ PROMISE GUARANTEES                                                          │
+ * ├─────────────────────────────────────────────────────────────────────────────┤
+ * │                                                                             │
+ * │   1. A Promise settles EXACTLY ONCE                                         │
+ * │   2. Once settled, the state CANNOT change                                  │
+ * │   3. Multiple resolve/reject calls are IGNORED                              │
+ * │                                                                             │
+ * │                                                                             │
+ * │   resolve("first");  ──▶ Promise fulfilled with "first"                     │
+ * │   resolve("second"); ──▶ IGNORED! Already settled                           │
+ * │   reject("error");   ──▶ IGNORED! Already settled                           │
+ * │                                                                             │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ */
+
+const immutableDemo = new Promise((resolve, reject) => {
+    resolve("First value");   // This wins!
+    resolve("Second value");  // Ignored
+    reject("Error");          // Also ignored
+    console.log("All resolve/reject calls made");
+});
+
+immutableDemo.then(value => {
+    console.log("Promise resolved with:", value);  // "First value"
+});
+
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SECTION 3: .then(), .catch(), .finally()
+// ════════════════════════════════════════════════════════════════════════════════
+
+console.log("\n═══ SECTION 3: CONSUMING PROMISES ═══\n");
+
+/**
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │ PROMISE METHODS                                                             │
+ * ├─────────────────────────────────────────────────────────────────────────────┤
+ * │                                                                             │
+ * │   .then(onFulfilled, onRejected)                                            │
+ * │   ─────────────────────────────────────────────────────────────────────     │
+ * │   • Called when Promise fulfills (or rejects if 2nd arg provided)           │
+ * │   • Returns a NEW Promise (enables chaining!)                               │
+ * │                                                                             │
+ * │                                                                             │
+ * │   .catch(onRejected)                                                        │
+ * │   ─────────────────────────────────────────────────────────────────────     │
+ * │   • Shorthand for .then(undefined, onRejected)                              │
+ * │   • Catches errors from ANY previous step in chain                          │
+ * │   • Also returns a NEW Promise                                              │
+ * │                                                                             │
+ * │                                                                             │
+ * │   .finally(onFinally)                                                       │
+ * │   ─────────────────────────────────────────────────────────────────────     │
+ * │   • Called regardless of success or failure                                 │
+ * │   • Receives NO arguments                                                   │
+ * │   • Perfect for cleanup (close connections, hide loaders)                   │
+ * │   • Passes through the original value/error                                 │
+ * │                                                                             │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ */
+
+// Basic .then()
+Promise.resolve(42)
+    .then(value => {
+        console.log("Value:", value);  // 42
+        return value * 2;
+    })
+    .then(value => {
+        console.log("Doubled:", value);  // 84
+    });
+
+// .catch() for errors
+Promise.reject(new Error("Something went wrong"))
+    .then(value => {
+        console.log("This won't run");
+    })
+    .catch(error => {
+        console.log("Caught:", error.message);  // "Something went wrong"
+        return "Recovered!";  // Can return a recovery value
+    })
+    .then(value => {
+        console.log("After catch:", value);  // "Recovered!"
+    });
+
+// .finally() for cleanup
+Promise.resolve("data")
+    .then(data => {
+        console.log("Got:", data);
+        return data;
+    })
+    .finally(() => {
+        console.log("Cleanup! (always runs)");
+    })
+    .then(data => {
+        console.log("Still have:", data);  // "data" passes through
+    });
+
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SECTION 4: PROMISE CHAINING
+// ════════════════════════════════════════════════════════════════════════════════
+
+console.log("\n═══ SECTION 4: PROMISE CHAINING ═══\n");
+
+/**
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │ THE KEY CONCEPT: Each .then() returns a NEW Promise!                        │
+ * ├─────────────────────────────────────────────────────────────────────────────┤
+ * │                                                                             │
+ * │   promise                                                                   │
+ * │      │                                                                      │
+ * │      ▼                                                                      │
+ * │   .then(x => x + 1)  ───▶ Returns NEW Promise with value (x + 1)            │
+ * │      │                                                                      │
+ * │      ▼                                                                      │
+ * │   .then(x => x * 2)  ───▶ Returns NEW Promise with value (x * 2)            │
+ * │      │                                                                      │
+ * │      ▼                                                                      │
+ * │   .then(console.log) ───▶ Returns NEW Promise (undefined from console.log)  │
+ * │                                                                             │
+ * │                                                                             │
+ * │   WHAT YOU RETURN MATTERS:                                                  │
+ * │   ─────────────────────────────────────────────────────────────────────     │
+ * │   • Return value      → Next .then gets that value                          │
+ * │   • Return Promise    → Next .then waits for it, gets its value             │
+ * │   • Throw error       → Skips to .catch()                                   │
+ * │   • Return nothing    → Next .then gets undefined                           │
+ * │                                                                             │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ */
+
+// Chaining with values
+Promise.resolve(1)
+    .then(x => {
+        console.log("Step 1:", x);  // 1
+        return x + 1;
+    })
+    .then(x => {
+        console.log("Step 2:", x);  // 2
+        return x * 2;
+    })
+    .then(x => {
+        console.log("Step 3:", x);  // 4
+    });
+
+// Chaining with Promises (automatic unwrapping)
+function fetchUser(id) {
+    return new Promise(resolve => {
+        setTimeout(() => resolve({ id, name: "John" }), 100);
+    });
+}
+
+function fetchPosts(userId) {
+    return new Promise(resolve => {
+        setTimeout(() => resolve([{ id: 1, title: "Hello" }]), 100);
+    });
+}
+
+// FLAT chain (not nested like callbacks!)
+fetchUser(1)
+    .then(user => {
+        console.log("User:", user.name);
+        return fetchPosts(user.id);  // Return Promise
+    })
+    .then(posts => {
+        console.log("Posts:", posts.length);  // Automatically unwrapped!
+    })
+    .catch(error => {
+        console.error("Error:", error);  // One error handler for entire chain!
+    });
+
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SECTION 5: ERROR HANDLING
+// ════════════════════════════════════════════════════════════════════════════════
+
+console.log("\n═══ SECTION 5: ERROR HANDLING ═══\n");
+
+/**
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │ ERROR PROPAGATION IN PROMISE CHAINS                                         │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ *
+ *
+ *   Promise.resolve()
+ *       │
+ *       ▼
+ *   .then(step1)  ───▶ ERROR THROWN!
+ *       │                   │
+ *       ▼                   │
+ *   .then(step2)  ◀────────┘ SKIPPED!
+ *       │
+ *       ▼
+ *   .then(step3)  ─────────── SKIPPED!
+ *       │
+ *       ▼
+ *   .catch(handleError)  ◀── Error caught here!
+ *       │
+ *       ▼
+ *   .then(afterCatch)  ───── Can continue after recovery
+ *
+ */
+
+// Error propagation demo
+Promise.resolve("start")
+    .then(value => {
+        console.log("Step 1:", value);
+        throw new Error("Oops!");  // Error thrown
+    })
+    .then(value => {
+        console.log("Step 2 - SKIPPED");
+    })
+    .then(value => {
+        console.log("Step 3 - SKIPPED");
+    })
+    .catch(error => {
+        console.log("Caught:", error.message);
+        return "recovered";  // Recovery
+    })
+    .then(value => {
+        console.log("After recovery:", value);
+    });
+
+
+/**
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │ .catch() PLACEMENT MATTERS!                                                 │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ *
+ *   .catch() only catches errors from ABOVE it in the chain:
+ *
+ *   promise
+ *       .catch(...)   ← Won't catch errors below!
+ *       .then(...)    ← If this throws, unhandled!
+ *
+ *   vs
+ *
+ *   promise
+ *       .then(...)
+ *       .catch(...)   ← Catches errors from above
+ */
+
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SECTION 6: PROMISE STATIC METHODS
+// ════════════════════════════════════════════════════════════════════════════════
+
+console.log("\n═══ SECTION 6: STATIC METHODS ═══\n");
+
+/**
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │ PROMISE STATIC METHODS COMPARISON                                           │
+ * ├─────────────────────────────────────────────────────────────────────────────┤
+ * │                                                                             │
+ * │   METHOD              WAITS FOR     FAILS WHEN          RESULT              │
+ * │   ═══════════════════════════════════════════════════════════════════════   │
+ * │   Promise.all         All           First rejects       Array of values     │
+ * │   Promise.allSettled  All           Never               Array of results    │
+ * │   Promise.race        First         First settles       First value/error   │
+ * │   Promise.any         First fulfill All reject          First success       │
+ * │                                                                             │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ */
+
+
+// ─────────────────────────────────────────────────────────────────────────────────
+// Promise.all() - All must succeed, FAIL FAST
+// ─────────────────────────────────────────────────────────────────────────────────
+
+/**
+ *   Promise.all([p1, p2, p3])
+ *
+ *   ┌──────┐  ┌──────┐  ┌──────┐
+ *   │  p1  │  │  p2  │  │  p3  │
+ *   └──┬───┘  └──┬───┘  └──┬───┘
+ *      │         │         │
+ *      ▼         ▼         ▼
+ *   ┌─────────────────────────┐
+ *   │     Promise.all()       │
+ *   │                         │
+ *   │  Wait for ALL to finish │
+ *   │  OR fail on first error │
+ *   └────────────┬────────────┘
+ *                │
+ *                ▼
+ *   Success: [result1, result2, result3]
+ *   Failure: First error (others ignored)
+ */
+
+const p1 = Promise.resolve(1);
+const p2 = new Promise(resolve => setTimeout(() => resolve(2), 100));
+const p3 = Promise.resolve(3);
+
+Promise.all([p1, p2, p3])
+    .then(results => {
+        console.log("Promise.all results:", results);  // [1, 2, 3]
+    });
+
+// Fail fast behavior
+Promise.all([
+    Promise.resolve("success"),
+    Promise.reject(new Error("fail")),
+    Promise.resolve("ignored")
+])
+    .then(results => console.log("Won't run"))
+    .catch(error => console.log("Promise.all failed:", error.message));
+
+
+// ─────────────────────────────────────────────────────────────────────────────────
+// Promise.allSettled() - Wait for ALL, never fails
+// ─────────────────────────────────────────────────────────────────────────────────
+
+/**
+ *   Returns array of result objects:
+ *   { status: 'fulfilled', value: ... }
+ *   { status: 'rejected', reason: ... }
+ */
+
+Promise.allSettled([
+    Promise.resolve("success"),
+    Promise.reject(new Error("fail")),
+    Promise.resolve("another success")
+])
+    .then(results => {
+        console.log("Promise.allSettled:");
+        results.forEach((result, i) => {
+            if (result.status === "fulfilled") {
+                console.log(`  ${i}: fulfilled - ${result.value}`);
+            } else {
+                console.log(`  ${i}: rejected - ${result.reason.message}`);
+            }
+        });
+    });
+
+
+// ─────────────────────────────────────────────────────────────────────────────────
+// Promise.race() - First to SETTLE wins (fulfill OR reject)
+// ─────────────────────────────────────────────────────────────────────────────────
+
+/**
+ *   ┌──────┐  ┌──────┐  ┌──────┐
+ *   │  p1  │  │  p2  │  │  p3  │
+ *   │ 100ms│  │ 50ms │  │ 200ms│
+ *   └──┬───┘  └──┬───┘  └──┬───┘
+ *      │    ╔════╧════╗    │
+ *      │    ║ WINNER! ║    │
+ *      │    ╚════╤════╝    │
+ *      └─────────┴─────────┘
+ *                │
+ *                ▼
+ *         p2's result (first to finish)
+ */
+
+const slow = new Promise(resolve => setTimeout(() => resolve("slow"), 200));
+const fast = new Promise(resolve => setTimeout(() => resolve("fast"), 50));
+
+Promise.race([slow, fast])
+    .then(winner => console.log("Race winner:", winner));  // "fast"
+
+
+// Useful for timeouts:
+function fetchWithTimeout(promise, ms) {
+    const timeout = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Timeout!")), ms);
+    });
+    return Promise.race([promise, timeout]);
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────────
+// Promise.any() - First to FULFILL wins (ignores rejections)
+// ─────────────────────────────────────────────────────────────────────────────────
+
+Promise.any([
+    Promise.reject(new Error("Error 1")),
+    Promise.resolve("Success!"),
+    Promise.reject(new Error("Error 2"))
+])
+    .then(value => console.log("Promise.any winner:", value));  // "Success!"
+
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SECTION 7: MICROTASK QUEUE DEMO
+// ════════════════════════════════════════════════════════════════════════════════
+
+console.log("\n═══ SECTION 7: MICROTASK QUEUE ═══\n");
+
+console.log("1. Sync start");
+
+setTimeout(() => console.log("4. Macrotask (setTimeout)"), 0);
+
+Promise.resolve()
+    .then(() => console.log("2. Microtask (Promise)"))
+    .then(() => console.log("3. Microtask (chained)"));
+
+console.log("5. Sync end");
+
+// Output: 1, 5, 2, 3, 4
+// Explanation:
+// - Sync code first (1, 5)
+// - Then ALL microtasks (2, 3)
+// - Then macrotasks (4)
+
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SECTION 8: PROMISIFICATION (Converting Callbacks to Promises)
+// ════════════════════════════════════════════════════════════════════════════════
+
+console.log("\n═══ SECTION 8: PROMISIFICATION ═══\n");
+
+/**
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │ CONVERTING CALLBACK-BASED FUNCTIONS TO PROMISES                             │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ *
+ *   BEFORE (callback):              AFTER (promise):
+ *
+ *   readFile(path, (err, data) =>   readFilePromise(path)
+ *       if (err) handleError(err);      .then(data => ...)
+ *       else handleData(data);          .catch(err => ...);
+ *   });
+ */
+
+// Original callback function
+function readFileCallback(filename, callback) {
+    setTimeout(() => {
+        if (filename === "error.txt") {
+            callback(new Error("Not found"), null);
+        } else {
+            callback(null, `Contents of ${filename}`);
+        }
+    }, 100);
+}
+
+// Promisified version
+function readFilePromise(filename) {
+    return new Promise((resolve, reject) => {
+        readFileCallback(filename, (err, data) => {
+            if (err) reject(err);
+            else resolve(data);
+        });
+    });
+}
+
+// Usage
+readFilePromise("data.txt")
+    .then(data => console.log("Promisified read:", data))
+    .catch(err => console.error("Error:", err.message));
+
+
+// Generic promisify utility
+function promisify(fn) {
+    return function(...args) {
+        return new Promise((resolve, reject) => {
+            fn(...args, (err, result) => {
+                if (err) reject(err);
+                else resolve(result);
+            });
+        });
+    };
+}
+
+const readFileAsync = promisify(readFileCallback);
+readFileAsync("test.txt")
+    .then(data => console.log("Generic promisify:", data));
+
+
+// ════════════════════════════════════════════════════════════════════════════════
+// SECTION 9: INTERVIEW QUESTIONS
+// ════════════════════════════════════════════════════════════════════════════════
+
+console.log("\n═══ SECTION 9: INTERVIEW QUESTIONS ═══\n");
+
+/**
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │ COMMON INTERVIEW QUESTIONS                                                  │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ *
+ *
+ * Q1: What are the three states of a Promise?
+ * ──────────────────────────────────────────────────────────────────────────────
+ * A: pending, fulfilled, rejected.
+ *    Once settled (fulfilled/rejected), state cannot change.
+ *
+ *
+ * Q2: What's the difference between Promise.all() and Promise.allSettled()?
+ * ──────────────────────────────────────────────────────────────────────────────
+ * A: Promise.all() fails fast on first rejection.
+ *    Promise.allSettled() waits for all and returns status objects.
+ *
+ *
+ * Q3: Why do Promise callbacks run before setTimeout(fn, 0)?
+ * ──────────────────────────────────────────────────────────────────────────────
+ * A: Promises use the microtask queue which has higher priority
+ *    than the macrotask queue where setTimeout is placed.
+ *
+ *
+ * Q4: What does .then() return?
+ * ──────────────────────────────────────────────────────────────────────────────
+ * A: A NEW Promise. This enables chaining.
+ *    The returned Promise resolves with the return value of the callback.
+ *
+ *
+ * Q5: TRICKY - What's the output?
+ * ──────────────────────────────────────────────────────────────────────────────
+ */
+
+console.log("Interview Question:");
+
+console.log("A");
+
+Promise.resolve()
+    .then(() => {
+        console.log("B");
+        return Promise.resolve("C");
+    })
+    .then(console.log);
+
+setTimeout(() => console.log("D"), 0);
+
+console.log("E");
+
+// Output: A, E, B, C, D
+// - A, E are sync
+// - B runs as microtask
+// - C runs as microtask (nested Promise)
+// - D runs as macrotask (last)
+
+
+/**
+ * ════════════════════════════════════════════════════════════════════════════════
+ * SUMMARY
+ * ════════════════════════════════════════════════════════════════════════════════
+ *
+ *
+ *   ┌─────────────────────────────────────────────────────────────────────────────┐
+ *   │                          KEY TAKEAWAYS                                      │
+ *   ├─────────────────────────────────────────────────────────────────────────────┤
+ *   │                                                                             │
+ *   │   PROMISE STATES                                                            │
+ *   │   ├── pending → fulfilled (has value)                                       │
+ *   │   ├── pending → rejected (has reason)                                       │
+ *   │   └── IMMUTABLE once settled!                                               │
+ *   │                                                                             │
+ *   │   PROMISE METHODS                                                           │
+ *   │   ├── .then(onFulfilled) - handle success                                   │
+ *   │   ├── .catch(onRejected) - handle errors                                    │
+ *   │   ├── .finally(onFinally) - cleanup                                         │
+ *   │   └── ALL return NEW Promises (chaining!)                                   │
+ *   │                                                                             │
+ *   │   STATIC METHODS                                                            │
+ *   │   ├── Promise.all() - all must succeed, fail fast                           │
+ *   │   ├── Promise.allSettled() - wait for all, never fails                      │
+ *   │   ├── Promise.race() - first to settle wins                                 │
+ *   │   └── Promise.any() - first to fulfill wins                                 │
+ *   │                                                                             │
+ *   │   MICROTASK QUEUE                                                           │
+ *   │   ├── Higher priority than macrotask queue                                  │
+ *   │   ├── Promise callbacks are microtasks                                      │
+ *   │   └── ALL microtasks run before ANY macrotask                               │
+ *   │                                                                             │
+ *   └─────────────────────────────────────────────────────────────────────────────┘
+ *
+ *
+ *   NEXT: 03-async-await-mechanics.js - Syntactic sugar over Promises!
+ */
+
+console.log("\n═══ FILE 2 COMPLETE ═══");
+console.log("Run: node 03-async-await-mechanics.js");
