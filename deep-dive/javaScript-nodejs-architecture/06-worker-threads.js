@@ -1,0 +1,900 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * NODE.JS ARCHITECTURE - FILE 6: WORKER THREADS
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * Deep dive into Node.js Worker Threads - true multi-threading in Node.js
+ * for CPU-intensive tasks without blocking the main event loop.
+ */
+
+console.log("═══════════════════════════════════════════════════════════════════");
+console.log("       NODE.JS WORKER THREADS - TRUE MULTI-THREADING               ");
+console.log("═══════════════════════════════════════════════════════════════════\n");
+
+/**
+ * ╔═══════════════════════════════════════════════════════════════════════════╗
+ * ║                    WORKER THREADS vs CLUSTER                               ║
+ * ╠═══════════════════════════════════════════════════════════════════════════╣
+ * ║                                                                            ║
+ * ║  ┌────────────────────────────────────────────────────────────────────┐   ║
+ * ║  │                        CLUSTER MODULE                               │   ║
+ * ║  │                                                                     │   ║
+ * ║  │   Process 1         Process 2         Process 3                    │   ║
+ * ║  │   ┌─────────┐       ┌─────────┐       ┌─────────┐                  │   ║
+ * ║  │   │   V8    │       │   V8    │       │   V8    │                  │   ║
+ * ║  │   │ Engine  │       │ Engine  │       │ Engine  │                  │   ║
+ * ║  │   ├─────────┤       ├─────────┤       ├─────────┤                  │   ║
+ * ║  │   │ Memory  │       │ Memory  │       │ Memory  │                  │   ║
+ * ║  │   │  (Own)  │       │  (Own)  │       │  (Own)  │                  │   ║
+ * ║  │   └─────────┘       └─────────┘       └─────────┘                  │   ║
+ * ║  │                                                                     │   ║
+ * ║  │   • Separate processes (heavy)                                      │   ║
+ * ║  │   • No shared memory                                                │   ║
+ * ║  │   • IPC for communication (slow)                                    │   ║
+ * ║  │   • Good for: scaling HTTP servers                                  │   ║
+ * ║  └────────────────────────────────────────────────────────────────────┘   ║
+ * ║                                                                            ║
+ * ║  ┌────────────────────────────────────────────────────────────────────┐   ║
+ * ║  │                       WORKER THREADS                                │   ║
+ * ║  │                                                                     │   ║
+ * ║  │              Single Process                                         │   ║
+ * ║  │   ┌─────────────────────────────────────────────┐                  │   ║
+ * ║  │   │                                             │                  │   ║
+ * ║  │   │  Thread 1    Thread 2    Thread 3          │                  │   ║
+ * ║  │   │  ┌──────┐    ┌──────┐    ┌──────┐          │                  │   ║
+ * ║  │   │  │  V8  │    │  V8  │    │  V8  │          │                  │   ║
+ * ║  │   │  │ Iso- │    │ Iso- │    │ Iso- │          │                  │   ║
+ * ║  │   │  │ late │    │ late │    │ late │          │                  │   ║
+ * ║  │   │  └──┬───┘    └──┬───┘    └──┬───┘          │                  │   ║
+ * ║  │   │     │           │           │              │                  │   ║
+ * ║  │   │     └───────────┼───────────┘              │                  │   ║
+ * ║  │   │                 ▼                          │                  │   ║
+ * ║  │   │      ┌─────────────────────┐               │                  │   ║
+ * ║  │   │      │   SharedArrayBuffer │               │                  │   ║
+ * ║  │   │      │   (Shared Memory)   │               │                  │   ║
+ * ║  │   │      └─────────────────────┘               │                  │   ║
+ * ║  │   └─────────────────────────────────────────────┘                  │   ║
+ * ║  │                                                                     │   ║
+ * ║  │   • True threads (lightweight)                                      │   ║
+ * ║  │   • Can share memory (SharedArrayBuffer)                            │   ║
+ * ║  │   • Fast communication (postMessage)                                │   ║
+ * ║  │   • Good for: CPU-intensive tasks                                   │   ║
+ * ║  └────────────────────────────────────────────────────────────────────┘   ║
+ * ║                                                                            ║
+ * ╚═══════════════════════════════════════════════════════════════════════════╝
+ */
+
+const {
+  Worker,
+  isMainThread,
+  parentPort,
+  workerData,
+  MessageChannel,
+  threadId
+} = require('worker_threads');
+
+console.log("1️⃣  CLUSTER vs WORKER THREADS COMPARISON\n");
+
+console.log(`
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                    CLUSTER vs WORKER THREADS                                  │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  Feature           │  Cluster Module        │  Worker Threads               │
+├────────────────────┼────────────────────────┼───────────────────────────────┤
+│  Type              │  Multiple processes    │  Multiple threads             │
+│  Memory            │  Separate (isolated)   │  Can share (SharedArrayBuffer)│
+│  Communication     │  IPC (serialization)   │  postMessage or SharedMemory  │
+│  Startup cost      │  Heavy (fork process)  │  Lighter (new thread)         │
+│  V8 instances      │  One per process       │  One per thread (V8 Isolate)  │
+│  Event loop        │  One per process       │  One per thread               │
+│  Use case          │  Scale HTTP servers    │  CPU-intensive computation    │
+│  Overhead          │  Higher                │  Lower                        │
+│  Fault isolation   │  Complete              │  Partial (same process)       │
+└──────────────────────────────────────────────────────────────────────────────┘
+`);
+
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                        BASIC WORKER THREAD
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+console.log("═".repeat(70));
+console.log("2️⃣  BASIC WORKER THREAD EXAMPLE\n");
+
+/**
+ * ┌───────────────────────────────────────────────────────────────────────────┐
+ * │                    WORKER THREAD LIFECYCLE                                 │
+ * ├───────────────────────────────────────────────────────────────────────────┤
+ * │                                                                            │
+ * │   Main Thread                          Worker Thread                       │
+ * │   ──────────                          ─────────────                       │
+ * │        │                                                                   │
+ * │        │  new Worker('file.js')                                           │
+ * │        │─────────────────────────────────►│                               │
+ * │        │                                  │ Execute script                │
+ * │        │                                  │                               │
+ * │        │◄──── 'online' event ─────────────│                               │
+ * │        │                                  │                               │
+ * │        │  worker.postMessage(data)        │                               │
+ * │        │─────────────────────────────────►│                               │
+ * │        │                                  │ parentPort.on('message')      │
+ * │        │                                  │                               │
+ * │        │◄── parentPort.postMessage(res) ──│                               │
+ * │        │  worker.on('message')            │                               │
+ * │        │                                  │                               │
+ * │        │◄──── 'exit' event ───────────────│                               │
+ * │        │                                  │                               │
+ * │        ▼                                  ▼                               │
+ * │                                                                            │
+ * └───────────────────────────────────────────────────────────────────────────┘
+ */
+
+// Example: Inline Worker (using eval)
+console.log("=== Basic Worker Thread Demo ===\n");
+
+// Inline worker code for demonstration
+const workerCode = `
+  const { parentPort, workerData } = require('worker_threads');
+
+  // Receive initial data
+  console.log('Worker started with data:', workerData);
+
+  // Simulate CPU-intensive work
+  function fibonacci(n) {
+    if (n <= 1) return n;
+    return fibonacci(n - 1) + fibonacci(n - 2);
+  }
+
+  // Listen for messages
+  parentPort.on('message', (n) => {
+    console.log('Worker computing fibonacci(' + n + ')...');
+    const result = fibonacci(n);
+    parentPort.postMessage({ n, result });
+  });
+`;
+
+// Note: In real code, worker code would be in a separate file
+console.log(`
+// main.js - Main Thread
+const { Worker } = require('worker_threads');
+
+// Create worker from file
+const worker = new Worker('./worker.js', {
+  workerData: { initialValue: 42 }
+});
+
+// Handle messages from worker
+worker.on('message', (result) => {
+  console.log('Result from worker:', result);
+});
+
+// Handle errors
+worker.on('error', (err) => {
+  console.error('Worker error:', err);
+});
+
+// Handle exit
+worker.on('exit', (code) => {
+  console.log('Worker exited with code:', code);
+});
+
+// Send task to worker
+worker.postMessage(40); // Calculate fibonacci(40)
+
+// ─────────────────────────────────────────────────────────────────────────
+
+// worker.js - Worker Thread
+const { parentPort, workerData } = require('worker_threads');
+
+console.log('Worker started with:', workerData);
+
+function fibonacci(n) {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+parentPort.on('message', (n) => {
+  const result = fibonacci(n);
+  parentPort.postMessage({ n, result });
+});
+`);
+
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                        WORKER DATA PASSING
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+console.log("\n" + "═".repeat(70));
+console.log("3️⃣  DATA PASSING METHODS\n");
+
+/**
+ * ┌───────────────────────────────────────────────────────────────────────────┐
+ * │                    DATA PASSING METHODS                                    │
+ * ├───────────────────────────────────────────────────────────────────────────┤
+ * │                                                                            │
+ * │  1. workerData (one-time, at creation)                                    │
+ * │     ┌────────────┐         ┌────────────┐                                 │
+ * │     │   Main     │ ──────► │   Worker   │                                 │
+ * │     │   Thread   │ Clone   │   Thread   │                                 │
+ * │     └────────────┘         └────────────┘                                 │
+ * │     Data is cloned (structured clone algorithm)                           │
+ * │                                                                            │
+ * │  2. postMessage (bidirectional, anytime)                                  │
+ * │     ┌────────────┐ ◄─────► ┌────────────┐                                 │
+ * │     │   Main     │ Clone   │   Worker   │                                 │
+ * │     │   Thread   │         │   Thread   │                                 │
+ * │     └────────────┘         └────────────┘                                 │
+ * │     Data is cloned (serialization cost)                                   │
+ * │                                                                            │
+ * │  3. SharedArrayBuffer (shared memory)                                     │
+ * │     ┌────────────┐         ┌────────────┐                                 │
+ * │     │   Main     │         │   Worker   │                                 │
+ * │     │   Thread   │         │   Thread   │                                 │
+ * │     └─────┬──────┘         └─────┬──────┘                                 │
+ * │           │                      │                                         │
+ * │           └───────►┌────┐◄───────┘                                        │
+ * │                    │SAB │  (Zero-copy, same memory!)                      │
+ * │                    └────┘                                                 │
+ * │                                                                            │
+ * │  4. Transferable Objects (transfer ownership)                             │
+ * │     ┌────────────┐         ┌────────────┐                                 │
+ * │     │   Main     │ ──────► │   Worker   │                                 │
+ * │     │  (loses    │ Move    │  (gains    │                                 │
+ * │     │   access)  │         │   access)  │                                 │
+ * │     └────────────┘         └────────────┘                                 │
+ * │     ArrayBuffer becomes unusable in sender                                │
+ * │                                                                            │
+ * └───────────────────────────────────────────────────────────────────────────┘
+ */
+
+console.log(`
+// Method 1: workerData (initial data)
+const worker = new Worker('./worker.js', {
+  workerData: {
+    config: { timeout: 5000 },
+    items: [1, 2, 3]
+  }
+});
+
+// In worker:
+// const { workerData } = require('worker_threads');
+// console.log(workerData.config); // { timeout: 5000 }
+
+// ─────────────────────────────────────────────────────────────────────────
+
+// Method 2: postMessage (ongoing communication)
+// Main thread:
+worker.postMessage({ type: 'task', data: [1, 2, 3] });
+
+// Worker thread:
+// parentPort.on('message', (msg) => {
+//   if (msg.type === 'task') processTask(msg.data);
+// });
+
+// ─────────────────────────────────────────────────────────────────────────
+
+// Method 3: SharedArrayBuffer (shared memory)
+const sharedBuffer = new SharedArrayBuffer(1024);
+const view = new Int32Array(sharedBuffer);
+
+const worker = new Worker('./worker.js', {
+  workerData: { sharedBuffer }
+});
+
+// Both threads see the SAME memory!
+view[0] = 42; // Worker can also read this as 42
+
+// ─────────────────────────────────────────────────────────────────────────
+
+// Method 4: Transferable Objects (zero-copy transfer)
+const buffer = new ArrayBuffer(1024 * 1024); // 1MB
+
+worker.postMessage(buffer, [buffer]); // Transfer ownership
+// buffer.byteLength is now 0! (detached)
+
+// Worker receives the actual buffer (no copy)
+`);
+
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                        SHARED ARRAY BUFFER
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+console.log("═".repeat(70));
+console.log("4️⃣  SHAREDARRAY BUFFER - SHARED MEMORY\n");
+
+/**
+ * ┌───────────────────────────────────────────────────────────────────────────┐
+ * │                    SHAREDARRAY BUFFER ARCHITECTURE                         │
+ * ├───────────────────────────────────────────────────────────────────────────┤
+ * │                                                                            │
+ * │   ┌────────────────────────────────────────────────────────────────┐      │
+ * │   │                     Shared Memory Region                        │      │
+ * │   │  ┌──────┬──────┬──────┬──────┬──────┬──────┬──────┬──────┐    │      │
+ * │   │  │  0   │  1   │  2   │  3   │  4   │  5   │  6   │  7   │    │      │
+ * │   │  │ byte │ byte │ byte │ byte │ byte │ byte │ byte │ byte │    │      │
+ * │   │  └──────┴──────┴──────┴──────┴──────┴──────┴──────┴──────┘    │      │
+ * │   │              ▲                           ▲                      │      │
+ * │   │              │                           │                      │      │
+ * │   └──────────────┼───────────────────────────┼──────────────────────┘      │
+ * │                  │                           │                             │
+ * │    Main Thread   │            Worker Thread  │                             │
+ * │    Int32Array────┘            Int32Array─────┘                             │
+ * │    (view)                     (view)                                       │
+ * │                                                                            │
+ * │   ⚠️ WARNING: Race conditions possible!                                   │
+ * │   Use Atomics API for thread-safe operations                              │
+ * │                                                                            │
+ * └───────────────────────────────────────────────────────────────────────────┘
+ */
+
+console.log(`
+// SharedArrayBuffer Example
+
+// Main thread
+const sharedBuffer = new SharedArrayBuffer(4 * Int32Array.BYTES_PER_ELEMENT);
+const sharedArray = new Int32Array(sharedBuffer);
+
+// Initialize values
+sharedArray[0] = 0; // counter
+sharedArray[1] = 0; // status: 0=idle, 1=working, 2=done
+
+const worker = new Worker(\`
+  const { workerData, parentPort } = require('worker_threads');
+  const sharedArray = new Int32Array(workerData.sharedBuffer);
+
+  // Signal working
+  Atomics.store(sharedArray, 1, 1);
+
+  // Increment counter 1000 times
+  for (let i = 0; i < 1000; i++) {
+    Atomics.add(sharedArray, 0, 1);
+  }
+
+  // Signal done
+  Atomics.store(sharedArray, 1, 2);
+  parentPort.postMessage('done');
+\`, { eval: true, workerData: { sharedBuffer } });
+
+worker.on('message', () => {
+  console.log('Counter value:', Atomics.load(sharedArray, 0)); // 1000
+});
+`);
+
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                        ATOMICS API
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+console.log("\n" + "═".repeat(70));
+console.log("5️⃣  ATOMICS API - THREAD-SAFE OPERATIONS\n");
+
+/**
+ * ┌───────────────────────────────────────────────────────────────────────────┐
+ * │                    ATOMICS - PREVENTING RACE CONDITIONS                    │
+ * ├───────────────────────────────────────────────────────────────────────────┤
+ * │                                                                            │
+ * │   WITHOUT Atomics (Race Condition):                                       │
+ * │   ┌─────────────────────────────────────────────────────────────────┐    │
+ * │   │  Thread A              Shared Memory         Thread B            │    │
+ * │   │     │                     counter=0             │                │    │
+ * │   │     │  read(0)  ────────────►                   │                │    │
+ * │   │     │                            ◄──────────────│ read(0)        │    │
+ * │   │     │  write(1) ────────────►                   │                │    │
+ * │   │     │                  counter=1                │                │    │
+ * │   │     │                            ◄──────────────│ write(1)       │    │
+ * │   │     │                  counter=1  ← WRONG!      │                │    │
+ * │   │     │                  Expected 2               │                │    │
+ * │   └─────────────────────────────────────────────────────────────────┘    │
+ * │                                                                            │
+ * │   WITH Atomics (Thread-Safe):                                             │
+ * │   ┌─────────────────────────────────────────────────────────────────┐    │
+ * │   │  Thread A              Shared Memory         Thread B            │    │
+ * │   │     │                     counter=0             │                │    │
+ * │   │     │  Atomics.add(+1) ──►│                     │ BLOCKED        │    │
+ * │   │     │                  counter=1                │    │           │    │
+ * │   │     │                     │◄────────────────────│ Atomics.add(+1)│    │
+ * │   │     │                  counter=2  ← CORRECT!                     │    │
+ * │   └─────────────────────────────────────────────────────────────────┘    │
+ * │                                                                            │
+ * └───────────────────────────────────────────────────────────────────────────┘
+ */
+
+console.log(`
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        ATOMICS API METHODS                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Read/Write Operations:                                                      │
+│  ─────────────────────                                                       │
+│  Atomics.load(array, index)                  // Atomic read                  │
+│  Atomics.store(array, index, value)          // Atomic write                 │
+│  Atomics.exchange(array, index, value)       // Set and return old value    │
+│                                                                              │
+│  Arithmetic Operations:                                                      │
+│  ──────────────────────                                                      │
+│  Atomics.add(array, index, value)            // Add and return old value    │
+│  Atomics.sub(array, index, value)            // Subtract and return old     │
+│                                                                              │
+│  Bitwise Operations:                                                         │
+│  ──────────────────                                                          │
+│  Atomics.and(array, index, value)            // Bitwise AND                  │
+│  Atomics.or(array, index, value)             // Bitwise OR                   │
+│  Atomics.xor(array, index, value)            // Bitwise XOR                  │
+│                                                                              │
+│  Compare and Swap:                                                           │
+│  ────────────────                                                            │
+│  Atomics.compareExchange(arr, i, expected, replacement)                      │
+│  // If arr[i] === expected, set to replacement, return old value            │
+│                                                                              │
+│  Wait/Notify (Synchronization):                                              │
+│  ─────────────────────────────                                               │
+│  Atomics.wait(array, index, value, timeout)  // Block until value changes   │
+│  Atomics.notify(array, index, count)         // Wake waiting threads        │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+`);
+
+// Demonstrate Atomics
+console.log("=== Atomics Demo ===\n");
+
+const sab = new SharedArrayBuffer(Int32Array.BYTES_PER_ELEMENT);
+const arr = new Int32Array(sab);
+
+console.log("Initial value:", Atomics.load(arr, 0));
+
+Atomics.store(arr, 0, 10);
+console.log("After store(10):", Atomics.load(arr, 0));
+
+const oldVal = Atomics.add(arr, 0, 5);
+console.log("After add(5), old value was:", oldVal);
+console.log("New value:", Atomics.load(arr, 0));
+
+const swapped = Atomics.compareExchange(arr, 0, 15, 100);
+console.log("compareExchange(15, 100), returned:", swapped);
+console.log("Value after compareExchange:", Atomics.load(arr, 0));
+
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                        WORKER THREAD POOL
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+console.log("\n" + "═".repeat(70));
+console.log("6️⃣  WORKER THREAD POOL PATTERN\n");
+
+/**
+ * ┌───────────────────────────────────────────────────────────────────────────┐
+ * │                    WORKER THREAD POOL                                      │
+ * ├───────────────────────────────────────────────────────────────────────────┤
+ * │                                                                            │
+ * │                          Main Thread                                       │
+ * │                              │                                             │
+ * │                    ┌─────────┴─────────┐                                  │
+ * │                    │    Task Queue     │                                  │
+ * │                    │ [T1][T2][T3][T4]  │                                  │
+ * │                    └─────────┬─────────┘                                  │
+ * │                              │ Distribute                                  │
+ * │          ┌───────────────────┼───────────────────┐                        │
+ * │          │                   │                   │                        │
+ * │          ▼                   ▼                   ▼                        │
+ * │   ┌────────────┐      ┌────────────┐      ┌────────────┐                 │
+ * │   │  Worker 1  │      │  Worker 2  │      │  Worker 3  │                 │
+ * │   │            │      │            │      │            │                 │
+ * │   │ Processing │      │    Idle    │      │ Processing │                 │
+ * │   │    T1      │      │            │      │    T3      │                 │
+ * │   └────────────┘      └────────────┘      └────────────┘                 │
+ * │                                                                            │
+ * │   Benefits:                                                                │
+ * │   • Reuse workers (avoid creation overhead)                               │
+ * │   • Limit concurrency (prevent resource exhaustion)                       │
+ * │   • Queue management (handle bursts)                                      │
+ * │                                                                            │
+ * └───────────────────────────────────────────────────────────────────────────┘
+ */
+
+console.log(`
+// Worker Thread Pool Implementation
+
+const { Worker } = require('worker_threads');
+const os = require('os');
+
+class WorkerPool {
+  constructor(workerScript, poolSize = os.cpus().length) {
+    this.workerScript = workerScript;
+    this.poolSize = poolSize;
+    this.workers = [];
+    this.freeWorkers = [];
+    this.taskQueue = [];
+
+    // Initialize workers
+    for (let i = 0; i < poolSize; i++) {
+      this.addNewWorker();
+    }
+  }
+
+  addNewWorker() {
+    const worker = new Worker(this.workerScript);
+
+    worker.on('message', (result) => {
+      // Task completed
+      worker.currentResolve(result);
+      worker.currentResolve = null;
+      worker.currentReject = null;
+
+      // Process next task if available
+      if (this.taskQueue.length > 0) {
+        const { task, resolve, reject } = this.taskQueue.shift();
+        this.runTask(worker, task, resolve, reject);
+      } else {
+        this.freeWorkers.push(worker);
+      }
+    });
+
+    worker.on('error', (err) => {
+      if (worker.currentReject) {
+        worker.currentReject(err);
+      }
+      // Replace crashed worker
+      this.workers = this.workers.filter(w => w !== worker);
+      this.addNewWorker();
+    });
+
+    this.workers.push(worker);
+    this.freeWorkers.push(worker);
+  }
+
+  runTask(worker, task, resolve, reject) {
+    worker.currentResolve = resolve;
+    worker.currentReject = reject;
+    worker.postMessage(task);
+  }
+
+  exec(task) {
+    return new Promise((resolve, reject) => {
+      if (this.freeWorkers.length > 0) {
+        const worker = this.freeWorkers.pop();
+        this.runTask(worker, task, resolve, reject);
+      } else {
+        // Queue the task
+        this.taskQueue.push({ task, resolve, reject });
+      }
+    });
+  }
+
+  async destroy() {
+    for (const worker of this.workers) {
+      await worker.terminate();
+    }
+  }
+}
+
+// Usage:
+const pool = new WorkerPool('./cpu-intensive-worker.js', 4);
+
+// Execute tasks
+const results = await Promise.all([
+  pool.exec({ type: 'fibonacci', n: 40 }),
+  pool.exec({ type: 'fibonacci', n: 41 }),
+  pool.exec({ type: 'fibonacci', n: 42 }),
+  pool.exec({ type: 'fibonacci', n: 43 }),
+]);
+
+await pool.destroy();
+`);
+
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                    MESSAGE CHANNEL
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+console.log("\n" + "═".repeat(70));
+console.log("7️⃣  MESSAGE CHANNEL - DIRECT WORKER COMMUNICATION\n");
+
+/**
+ * ┌───────────────────────────────────────────────────────────────────────────┐
+ * │                    MESSAGE CHANNEL                                         │
+ * ├───────────────────────────────────────────────────────────────────────────┤
+ * │                                                                            │
+ * │   Without MessageChannel:                                                  │
+ * │   ┌────────┐         ┌────────┐         ┌────────┐                        │
+ * │   │Worker 1│ ──────► │  Main  │ ──────► │Worker 2│                        │
+ * │   └────────┘         └────────┘         └────────┘                        │
+ * │   All messages go through main thread                                     │
+ * │                                                                            │
+ * │   With MessageChannel:                                                     │
+ * │   ┌────────┐ ◄─────────────────────────► ┌────────┐                       │
+ * │   │Worker 1│       Direct Link          │Worker 2│                        │
+ * │   └────────┘                             └────────┘                        │
+ * │   Workers communicate directly!                                           │
+ * │                                                                            │
+ * │   MessageChannel creates two connected MessagePorts:                       │
+ * │   ┌──────────────────────────────────────────────────┐                    │
+ * │   │  const { port1, port2 } = new MessageChannel();  │                    │
+ * │   │                                                   │                    │
+ * │   │  port1.postMessage() ──────► port2.on('message') │                    │
+ * │   │  port1.on('message') ◄────── port2.postMessage() │                    │
+ * │   └──────────────────────────────────────────────────┘                    │
+ * │                                                                            │
+ * └───────────────────────────────────────────────────────────────────────────┘
+ */
+
+console.log(`
+// Direct Worker-to-Worker Communication
+
+const { Worker, MessageChannel } = require('worker_threads');
+
+// Create channel
+const { port1, port2 } = new MessageChannel();
+
+// Worker 1 - Producer
+const producer = new Worker(\`
+  const { parentPort } = require('worker_threads');
+
+  parentPort.once('message', (port) => {
+    // Send data directly to consumer
+    for (let i = 0; i < 10; i++) {
+      port.postMessage({ item: i });
+    }
+    port.postMessage({ done: true });
+  });
+\`, { eval: true });
+
+// Worker 2 - Consumer
+const consumer = new Worker(\`
+  const { parentPort } = require('worker_threads');
+
+  parentPort.once('message', (port) => {
+    port.on('message', (msg) => {
+      if (msg.done) {
+        console.log('Consumer: All items received');
+      } else {
+        console.log('Consumer received:', msg.item);
+      }
+    });
+  });
+\`, { eval: true });
+
+// Transfer ports to workers
+producer.postMessage(port1, [port1]);
+consumer.postMessage(port2, [port2]);
+
+// Now workers communicate directly without going through main!
+`);
+
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                    USE CASES
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+console.log("═".repeat(70));
+console.log("8️⃣  WHEN TO USE WORKER THREADS\n");
+
+console.log(`
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    WHEN TO USE WORKER THREADS                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ✅ GOOD Use Cases:                                                         │
+│  ─────────────────                                                           │
+│  • Image/Video processing (encoding, resizing, filters)                     │
+│  • Cryptographic operations (hashing, encryption)                           │
+│  • Data compression/decompression                                           │
+│  • Mathematical computations (scientific, ML inference)                     │
+│  • Parsing large files (JSON, XML, CSV)                                     │
+│  • Code compilation/transpilation                                           │
+│  • PDF generation                                                           │
+│                                                                              │
+│  ❌ BAD Use Cases (use other approaches):                                   │
+│  ────────────────────────────────────────                                    │
+│  • I/O operations (already async via event loop)                            │
+│  • HTTP request handling (use Cluster for scaling)                          │
+│  • Database queries (already non-blocking)                                  │
+│  • File system operations (use streams)                                     │
+│  • Simple quick computations (overhead not worth it)                        │
+│                                                                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  Rule of Thumb:                                                              │
+│  ─────────────                                                               │
+│  If a computation takes > 10-50ms and blocks the event loop,                │
+│  consider moving it to a Worker Thread.                                     │
+│                                                                              │
+│  If the task is I/O-bound, the event loop handles it efficiently already.   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+`);
+
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                        INTERVIEW QUESTIONS
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+console.log("═".repeat(70));
+console.log("📋  WORKER THREADS - INTERVIEW QUESTIONS\n");
+
+console.log(`
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Q1: What's the difference between Cluster and Worker Threads?               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ A: Cluster:                                                                  │
+│    • Creates separate processes (heavy, isolated)                           │
+│    • No shared memory                                                       │
+│    • Communication via IPC (serialization required)                         │
+│    • Best for: scaling HTTP servers across CPU cores                        │
+│                                                                              │
+│    Worker Threads:                                                           │
+│    • Creates threads within same process (lighter)                          │
+│    • Can share memory via SharedArrayBuffer                                 │
+│    • Faster communication (can use shared memory)                           │
+│    • Best for: CPU-intensive operations, offloading computation             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Q2: How do Worker Threads share memory?                                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ A: Using SharedArrayBuffer:                                                  │
+│                                                                              │
+│    1. Create SharedArrayBuffer in main thread                               │
+│    2. Pass it to worker via workerData or postMessage                       │
+│    3. Both threads see the same memory                                      │
+│                                                                              │
+│    const sab = new SharedArrayBuffer(1024);                                 │
+│    const worker = new Worker('file.js', { workerData: { sab } });           │
+│                                                                              │
+│    ⚠️ Must use Atomics API for thread-safe operations!                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Q3: What is the Atomics API and why is it needed?                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ A: Atomics provides atomic (indivisible) operations on SharedArrayBuffer.   │
+│                                                                              │
+│    Without Atomics: Race conditions can occur when multiple threads         │
+│    read/write shared memory simultaneously.                                 │
+│                                                                              │
+│    Atomics.add(), Atomics.load(), Atomics.store() etc. guarantee that       │
+│    the operation completes without interruption from other threads.         │
+│                                                                              │
+│    Atomics.wait() and Atomics.notify() provide synchronization primitives   │
+│    similar to mutex/condition variables in other languages.                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Q4: What happens when you transfer an ArrayBuffer to a worker?              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ A: The buffer is moved (not copied):                                        │
+│                                                                              │
+│    worker.postMessage(buffer, [buffer]); // Second arg = transfer list     │
+│                                                                              │
+│    After transfer:                                                           │
+│    • Main thread's buffer is "detached" (byteLength becomes 0)             │
+│    • Worker receives the actual buffer (zero-copy)                          │
+│    • Very efficient for large data                                          │
+│                                                                              │
+│    Without transfer (just postMessage):                                     │
+│    • Buffer is cloned (memory copied)                                       │
+│    • Both threads have their own copy                                       │
+│    • Slower for large data                                                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Q5: When should you NOT use Worker Threads?                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ A: • I/O operations - Event loop already handles async I/O efficiently     │
+│    • Database queries - Already non-blocking                                │
+│    • HTTP handling - Use Cluster instead for scaling                        │
+│    • Quick operations - Thread creation overhead not worth it               │
+│                                                                              │
+│    Worker threads add complexity. Only use when:                            │
+│    • Computation blocks event loop (>10-50ms)                               │
+│    • Task is CPU-bound, not I/O-bound                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Q6: Does each Worker Thread have its own event loop?                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ A: Yes! Each worker thread has:                                              │
+│    • Its own V8 isolate (separate JS engine instance)                       │
+│    • Its own event loop                                                     │
+│    • Its own libuv thread pool                                              │
+│    • Separate JavaScript heap                                               │
+│                                                                              │
+│    But they share:                                                           │
+│    • Process (same PID)                                                     │
+│    • Some libuv resources                                                   │
+│    • SharedArrayBuffer memory (if passed)                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+`);
+
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                           CHEAT SHEET
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+
+console.log("═".repeat(70));
+console.log("📝  WORKER THREADS CHEAT SHEET\n");
+
+console.log(`
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                     WORKER THREADS QUICK REFERENCE                         ║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  Core Imports:                                                             ║
+║    const {                                                                 ║
+║      Worker,              // Create worker                                 ║
+║      isMainThread,        // true in main thread                           ║
+║      parentPort,          // Communication port (in worker)                ║
+║      workerData,          // Initial data (in worker)                      ║
+║      threadId,            // Current thread ID                             ║
+║      MessageChannel       // Direct thread communication                   ║
+║    } = require('worker_threads');                                          ║
+║                                                                            ║
+║  Create Worker:                                                            ║
+║    new Worker('./file.js')                                                 ║
+║    new Worker('./file.js', { workerData: {...} })                          ║
+║    new Worker(code, { eval: true })  // Inline code                        ║
+║                                                                            ║
+║  Main → Worker Communication:                                              ║
+║    worker.postMessage(data)          // Send to worker                     ║
+║    worker.on('message', cb)          // Receive from worker                ║
+║                                                                            ║
+║  Worker → Main Communication:                                              ║
+║    parentPort.postMessage(data)      // Send to main                       ║
+║    parentPort.on('message', cb)      // Receive from main                  ║
+║                                                                            ║
+║  Transfer (zero-copy):                                                     ║
+║    worker.postMessage(buf, [buf])    // Transfer ArrayBuffer               ║
+║                                                                            ║
+║  Worker Events:                                                            ║
+║    'online'   // Worker started                                            ║
+║    'message'  // Message received                                          ║
+║    'error'    // Uncaught error                                            ║
+║    'exit'     // Worker exited                                             ║
+║                                                                            ║
+║  Terminate:                                                                ║
+║    await worker.terminate()          // Graceful termination               ║
+║                                                                            ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                       ATOMICS QUICK REFERENCE                              ║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║                                                                            ║
+║  Read/Write:                                                               ║
+║    Atomics.load(arr, idx)                    // Read value                 ║
+║    Atomics.store(arr, idx, val)              // Write value                ║
+║                                                                            ║
+║  Arithmetic:                                                               ║
+║    Atomics.add(arr, idx, val)                // Add and return old         ║
+║    Atomics.sub(arr, idx, val)                // Subtract and return old    ║
+║                                                                            ║
+║  Compare-and-Swap:                                                         ║
+║    Atomics.compareExchange(arr, idx, expected, newVal)                     ║
+║                                                                            ║
+║  Synchronization:                                                          ║
+║    Atomics.wait(arr, idx, val, timeout)      // Block until changed        ║
+║    Atomics.notify(arr, idx, count)           // Wake waiters               ║
+║                                                                            ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+`);
+
+console.log("\n═══ FILE 6 COMPLETE ═══");
+console.log("Run: node 07-child-processes.js");
