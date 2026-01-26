@@ -2,17 +2,40 @@
 //
 // What prints for A and B?
 
-function outer() {
-  var secret = 'I am hidden';
+// function outer() {
+//   var secret = 'I am hidden';
 
-  function inner() {
-    return secret;
+//   function inner() {
+//     return secret;
+//   }
+
+//   return inner;
+// }
+
+// var getSecret = outer();
+
+// console.log('A:', getSecret());
+// console.log('B:', typeof secret);
+
+
+
+
+
+/**
+ * 
+ * What is a CLOSURE?
+ * 
+ * 
+ * 
+ */
+
+function outerFunction(){
+  var x = 10;
+  function innerFunction(){
+    return x;
   }
-
-  return inner;
+  return innerFunction;
 }
 
-var getSecret = outer();
-
-console.log('A:', getSecret());
-console.log('B:', typeof secret);
+let accessInner = outerFunction();
+console.log(accessInner())

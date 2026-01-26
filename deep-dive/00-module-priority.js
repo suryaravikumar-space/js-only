@@ -21,13 +21,13 @@
  * │ 3  │ Node.js Architecture     │ libuv, worker threads,      │ ✅ DONE   │
  * │    │                          │ cluster, streams            │           │
  * ├────┼──────────────────────────┼─────────────────────────────┼───────────┤
- * │ 4  │ Functional Programming   │ Currying, composition,      │ HIGH      │
+ * │ 4  │ Functional Programming   │ Currying, composition,      │ ✅ DONE   │
  * │    │                          │ monads, immutability        │           │
  * ├────┼──────────────────────────┼─────────────────────────────┼───────────┤
- * │ 5  │ JavaScript Security      │ XSS, CSRF, injection,       │ HIGH      │
+ * │ 5  │ JavaScript Security      │ XSS, CSRF, injection,       │ ✅ DONE   │
  * │    │                          │ prototype pollution         │           │
  * ├────┼──────────────────────────┼─────────────────────────────┼───────────┤
- * │ 6  │ Module Systems           │ CommonJS vs ESM,            │ MEDIUM    │
+ * │ 6  │ Module Systems           │ CommonJS vs ESM,            │ ✅ DONE   │
  * │    │                          │ bundling, tree-shaking      │           │
  * ├────┼──────────────────────────┼─────────────────────────────┼───────────┤
  * │ 7  │ Meta-programming         │ Proxy, Reflect,             │ MEDIUM    │
