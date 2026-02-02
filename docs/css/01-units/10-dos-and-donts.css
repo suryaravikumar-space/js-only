@@ -1,0 +1,112 @@
+/* ============================================================
+   CSS UNITS — DO's and DON'Ts
+   ============================================================ */
+
+
+/* ❌ DON'T: Use px for font-size */
+body { font-size: 16px; }
+/* If user sets browser default to 20px for accessibility,
+   this IGNORES their preference. */
+
+/* ✅ DO: Use rem for font-size */
+body { font-size: 1rem; }
+/* Respects user's browser settings. Accessible. */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use em for deeply nested font sizes */
+.parent { font-size: 1.2em; }
+.child  { font-size: 1.2em; }  /* 1.2 × 1.2 = 1.44 of root! */
+.grand  { font-size: 1.2em; }  /* 1.2 × 1.2 × 1.2 = 1.728! */
+
+/* ✅ DO: Use rem — no compounding */
+.parent { font-size: 1.2rem; }
+.child  { font-size: 1.2rem; }  /* always 1.2 × root */
+.grand  { font-size: 1.2rem; }  /* always 1.2 × root */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use 100vw for full width */
+.section { width: 100vw; }
+/* Includes scrollbar width → causes horizontal scrollbar! */
+
+/* ✅ DO: Use 100% for full width */
+.section { width: 100%; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use 100vh on mobile for full height */
+.hero { height: 100vh; }
+/* On mobile, 100vh = taller than visible area (includes URL bar) */
+
+/* ✅ DO: Use dvh on mobile */
+.hero { height: 100dvh; }
+/* Or fallback: */
+.hero {
+  height: 100vh;
+  height: 100dvh;  /* browsers that support it override the line above */
+}
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use vw alone for font-size */
+h1 { font-size: 5vw; }
+/* On 320px phone = 16px (ok), on 1920px desktop = 96px (HUGE!) */
+
+/* ✅ DO: Use clamp() for responsive fonts */
+h1 { font-size: clamp(1.5rem, 4vw, 3.5rem); }
+/* Bounded: minimum 24px, maximum 56px */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Set fixed height on text containers */
+.card { height: 200px; }
+/* Text overflows if content is longer than 200px */
+
+/* ✅ DO: Use min-height or let content decide */
+.card { min-height: 200px; }
+/* At least 200px, grows if content needs more */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use px for line-height */
+.text { font-size: 16px; line-height: 24px; }
+/* If child has font-size: 32px, line-height stays 24px → overlapping text */
+
+/* ✅ DO: Use unitless line-height */
+.text { font-size: 16px; line-height: 1.5; }
+/* Child with 32px font → line-height auto-becomes 48px */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use inches/cm for screen */
+.box { width: 5cm; padding: 1in; }
+/* 1 CSS inch ≠ 1 physical inch on screen */
+
+/* ✅ DO: Use in/cm only for print */
+@media print { .page { margin: 1in; } }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use transition: all */
+.button { transition: all 0.3s ease; }
+/* Transitions EVERY property change — performance hit */
+
+/* ✅ DO: Specify exact properties */
+.button { transition: background 0.3s ease, transform 0.3s ease; }

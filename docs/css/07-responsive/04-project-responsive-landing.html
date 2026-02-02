@@ -1,0 +1,322 @@
+<!-- ============================================================
+     MINI PROJECT: Responsive Landing Page
+     SKILLS: media queries, mobile-first, clamp(), auto-fit grid
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <!--
+    viewport meta tag:
+    - width=device-width → page width = device screen width
+    - initial-scale=1.0 → no zoom on load
+    - WITHOUT this, mobile browsers pretend the screen is ~980px
+      wide and zoom out to fit, making everything tiny
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page — Responsive Project</title>
+  <style>
+
+    /*
+      RESET
+      - box-sizing: border-box → width includes padding and border
+      - margin: 0 → removes browser default spacing on body, h1, p, etc.
+    */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /*
+      BASE STYLES (mobile-first)
+      - These styles apply to ALL screen sizes.
+      - We start with mobile because it's the smallest/simplest.
+      - Larger screens ADD styles via min-width media queries.
+
+      font-size: 1rem
+        → 16px (browser default).
+        → Using rem so if user changes browser font size,
+          everything scales with it (accessibility).
+
+      line-height: 1.6
+        → Unitless! Means 1.6 × computed font-size.
+        → If font-size is 16px → line-height = 25.6px.
+        → If a child has font-size: 32px → line-height = 51.2px.
+        → Unitless values recalculate per element.
+        → If we used 25.6px instead, it would stay 25.6px
+          even for the 32px child (text would overlap).
+    */
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    /*
+      CONTAINER
+      - width: 90% → takes 90% of parent (body) width.
+        10% is split 5% on each side = natural margin.
+      - max-width: 1100px → on very wide screens, caps at 1100px.
+        Without this, text lines become too long to read.
+      - margin: 0 auto → 0 top/bottom, auto left/right.
+        auto on left AND right = horizontally centered.
+    */
+    .container {
+      width: 90%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /*
+      HERO SECTION
+      - min-height: 80vh → at least 80% of viewport height.
+        min-height (not height) so it grows if content is taller.
+      - display: flex + align-items/justify-content: center
+        → perfectly centers the hero content both ways.
+      - padding: 2rem 0 → vertical breathing room.
+        On mobile, 2rem = 32px. Enough but not wasteful.
+      - text-align: center → centers text within the flex item.
+    */
+    .hero {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    /*
+      HERO TITLE
+      - clamp(min, preferred, max):
+        - 2rem (32px) = minimum size (small phones)
+        - 6vw = preferred size (scales with viewport width)
+          On 375px phone: 6vw = 22.5px → uses min (32px)
+          On 800px tablet: 6vw = 48px → uses 48px
+          On 1200px desktop: 6vw = 72px → uses max (56px)
+        - 3.5rem (56px) = maximum size (wide screens)
+      - Result: font smoothly scales between 32px and 56px.
+        No media queries needed for font sizing!
+
+      - margin-bottom: 1rem → space below title.
+        rem = consistent spacing regardless of nesting.
+    */
+    .hero__title {
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    /*
+      HERO SUBTITLE
+      - clamp(1rem, 2.5vw, 1.25rem) → smaller responsive range.
+        Stays between 16px and 20px.
+      - max-width: 55ch → limits line length to ~55 characters.
+        ch = width of "0" character. Optimal reading: 45-75ch.
+        margin: 0 auto → centers this narrower block.
+      - opacity: 0.9 → slightly transparent, creates visual hierarchy.
+        Title at full opacity feels more important than subtitle.
+    */
+    .hero__subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      max-width: 55ch;
+      margin: 0 auto 2rem;
+      opacity: 0.9;
+    }
+
+    /*
+      CTA BUTTON
+      - display: inline-block → behaves like inline (sits in centered text flow)
+        but accepts padding, width, height like a block.
+      - padding: 0.875em 2.5em → em units relative to BUTTON's font-size.
+        If font-size is 16px: padding = 14px top/bottom, 40px left/right.
+        If you later make a bigger button (font-size: 20px), padding
+        auto-scales to 17.5px / 50px. No extra CSS needed.
+      - border-radius: 50px → very large value on a small element
+        creates a "pill" shape (fully rounded sides).
+      - transition: transform 0.2s ease, box-shadow 0.2s ease
+        → only animate these 2 properties.
+        "all" would work but is slower (animates everything).
+    */
+    .cta {
+      display: inline-block;
+      padding: 0.875em 2.5em;
+      background: white;
+      color: #764ba2;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /*
+      CTA HOVER
+      - transform: translateY(-2px) → moves button UP 2px.
+        translateY is GPU-accelerated (doesn't cause reflow).
+        Using margin-top: -2px would cause layout recalculation.
+      - box-shadow adds depth feeling on hover.
+    */
+    .cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /*
+      FEATURES SECTION
+      - padding: 4rem 0 → vertical space. No horizontal (container handles that).
+    */
+    .features { padding: 4rem 0; }
+
+    .features__title {
+      text-align: center;
+      font-size: clamp(1.5rem, 4vw, 2.25rem);
+      margin-bottom: 2.5rem;
+    }
+
+    /*
+      FEATURES GRID
+      - repeat(auto-fit, minmax(280px, 1fr)):
+        - auto-fit: create as many columns as will fit
+        - minmax(280px, 1fr): each column is at least 280px,
+          grows up to 1fr (equal share of space)
+        - On 900px screen: 3 columns × 280px = 840px → fits 3 columns
+        - On 600px screen: 2 columns × 280px = 560px → fits 2 columns
+        - On 350px screen: 1 column → single column layout
+        - NO MEDIA QUERIES NEEDED!
+      - gap: 2rem → 32px space between cards on all sides.
+    */
+    .features__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    /*
+      FEATURE CARD
+      - padding: 2rem → inner space.
+      - border: 1px solid #eee → subtle border (px for thin lines).
+      - transition: transform 0.2s ease → smooth hover lift.
+    */
+    .feature-card {
+      padding: 2rem;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      transition: transform 0.2s ease;
+    }
+
+    .feature-card:hover { transform: translateY(-4px); }
+
+    .feature-card__icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card__title {
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card__text {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    /*
+      FOOTER
+      - padding: 2rem 0 → vertical space.
+      - text-align: center → centers text.
+      - border-top: 1px solid #eee → separator line.
+    */
+    .footer {
+      padding: 2rem 0;
+      text-align: center;
+      border-top: 1px solid #eee;
+      color: #888;
+      font-size: 0.85rem;
+    }
+
+
+    /* ===== MEDIA QUERY: TABLET AND UP (768px) =====
+       min-width: 48em → 768px (768 / 16 = 48).
+       Using em for media queries because em handles
+       browser zoom correctly. px breakpoints don't.
+       When user zooms 200%, em breakpoints trigger
+       at the right visual size. px breakpoints don't adjust.
+    */
+    @media (min-width: 48em) {
+      /*
+        On tablet, increase hero padding.
+        Mobile had 2rem, now 4rem = more breathing room.
+      */
+      .hero { padding: 4rem 0; }
+    }
+
+
+    /* ===== DARK MODE =====
+       prefers-color-scheme: dark detects OS dark mode setting.
+       User doesn't toggle anything — it reads system preference.
+    */
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a1a; color: #e0e0e0; }
+      .feature-card { border-color: #333; background: #222; }
+      .feature-card__text { color: #aaa; }
+      .footer { border-color: #333; color: #666; }
+    }
+
+
+    /* ===== REDUCED MOTION =====
+       prefers-reduced-motion: reduce detects if user has
+       enabled "reduce motion" in their OS accessibility settings.
+       Some users get motion sickness from animations.
+       We respect that by disabling all transitions.
+    */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <h1 class="hero__title">Build Something Amazing</h1>
+      <p class="hero__subtitle">A responsive landing page built with mobile-first CSS, clamp() typography, and auto-fit grid. Resize to see it adapt.</p>
+      <a href="#features" class="cta">Explore Features</a>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features container" id="features">
+    <h2 class="features__title">Why Choose Us</h2>
+    <div class="features__grid">
+      <div class="feature-card">
+        <div class="feature-card__icon">⚡</div>
+        <h3 class="feature-card__title">Lightning Fast</h3>
+        <p class="feature-card__text">Optimized for performance with minimal CSS. No frameworks, no bloat.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card__icon">📱</div>
+        <h3 class="feature-card__title">Fully Responsive</h3>
+        <p class="feature-card__text">Mobile-first design with auto-fit grid. Works on every screen size.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card__icon">♿</div>
+        <h3 class="feature-card__title">Accessible</h3>
+        <p class="feature-card__text">Respects user preferences: dark mode, font size, reduced motion.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer container">
+    <p>Built with pure CSS — no frameworks</p>
+  </footer>
+
+</body>
+</html>

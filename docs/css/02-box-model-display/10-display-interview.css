@@ -1,0 +1,86 @@
+/* ============================================================
+   DISPLAY & BOX MODEL — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: What is the difference between display: none and visibility: hidden?
+   ──────────────────────────────────────────────────────────────
+   display: none     → Element removed from layout. Takes NO space.
+                       Child elements also hidden. Not in accessibility tree.
+
+   visibility: hidden → Element is invisible but STILL takes space.
+                        Layout is preserved. Children can override with
+                        visibility: visible.
+*/
+
+
+/* Q2: What is the difference between inline, block, and inline-block?
+   ──────────────────────────────────────────────────────────────
+   block:        Full width, new line, can set width/height/margin
+   inline:       Content width only, same line, CANNOT set width/height
+   inline-block: Same line like inline, BUT can set width/height like block
+*/
+
+
+/* Q3: What is the CSS Box Model?
+   ──────────────────────────────────────────────────────────────
+   Every element is a box with 4 layers (inside out):
+   Content → Padding → Border → Margin
+
+   content-box (default): width = content only
+   border-box:            width = content + padding + border
+*/
+
+
+/* Q4: If an element has width:100px, padding:10px, border:5px,
+       what is the actual rendered width?
+   ──────────────────────────────────────────────────────────────
+   With content-box (default):
+   100 + 10 + 10 + 5 + 5 = 130px
+
+   With border-box:
+   100px total (content shrinks to 70px)
+*/
+
+
+/* Q5: Why should you use box-sizing: border-box?
+   ──────────────────────────────────────────────────────────────
+   Because width means TOTAL width. No surprise calculations.
+   Setting width:50% with padding won't overflow its parent.
+   Industry standard reset:
+*/
+*, *::before, *::after { box-sizing: border-box; }
+
+
+/* Q6: Can you set margin on an inline element?
+   ──────────────────────────────────────────────────────────────
+   Only horizontal margin (left/right) works.
+   Vertical margin (top/bottom) is IGNORED on inline elements.
+   Same with width and height — ignored on inline.
+*/
+
+
+/* Q7: What is margin collapse?
+   ──────────────────────────────────────────────────────────────
+   When two VERTICAL margins touch, they MERGE into one.
+   The larger margin wins.
+
+   div { margin-bottom: 30px; }
+   p   { margin-top: 20px; }
+   → Gap between them = 30px (not 50px)
+
+   Only happens vertically, never horizontally.
+   Does NOT happen with flexbox or grid children.
+*/
+
+
+/* Q8: What is the difference between padding and margin?
+   ──────────────────────────────────────────────────────────────
+   Padding = space INSIDE the border (between content and border)
+           → Has background color
+           → Cannot be negative
+
+   Margin  = space OUTSIDE the border (between elements)
+           → Always transparent
+           → CAN be negative (pulls elements closer)
+*/

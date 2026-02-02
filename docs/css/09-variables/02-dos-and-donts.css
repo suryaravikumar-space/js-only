@@ -1,0 +1,71 @@
+/* ============================================================
+   CSS VARIABLES — DO's and DON'Ts
+   ============================================================ */
+
+
+/* ❌ DON'T: Hardcode colors everywhere */
+.header { background: #007bff; }
+.button { background: #007bff; }
+.link   { color: #007bff; }
+/* Changing brand color = find-replace in 50 files */
+
+/* ✅ DO: Use CSS variables for repeated values */
+:root { --primary: #007bff; }
+.header { background: var(--primary); }
+.button { background: var(--primary); }
+.link   { color: var(--primary); }
+/* Change in ONE place → updates everywhere */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Make variable names too generic */
+:root { --color1: blue; --color2: red; --size: 16px; }
+/* What is color1? What is size? Unreadable. */
+
+/* ✅ DO: Use descriptive, semantic names */
+:root {
+  --color-primary: #007bff;
+  --color-danger: #dc3545;
+  --font-size-base: 1rem;
+}
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use variables inside media query conditions */
+:root { --breakpoint: 768px; }
+@media (min-width: var(--breakpoint)) { }
+/* DOESN'T WORK. Variables can't be used in media query conditions. */
+
+/* ✅ DO: Use variables only in property values */
+.box { width: var(--sidebar-width); }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Forget fallback values */
+.text { color: var(--text-color); }
+/* If --text-color is undefined → property becomes invalid, uses inherited */
+
+/* ✅ DO: Always provide a fallback */
+.text { color: var(--text-color, #333); }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Create too many variables for one-time values */
+:root {
+  --card-shadow-offset-x: 0;
+  --card-shadow-offset-y: 2px;
+  --card-shadow-blur: 8px;
+}
+/* Overengineered. Nobody will reuse these individually. */
+
+/* ✅ DO: Variable for the whole shadow or skip it */
+:root { --shadow-card: 0 2px 8px rgba(0,0,0,0.1); }
+.card { box-shadow: var(--shadow-card); }

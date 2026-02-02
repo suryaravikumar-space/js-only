@@ -1,0 +1,77 @@
+/* ============================================================
+   POSITIONING — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: What are the 5 position values? Explain each.
+   ──────────────────────────────────────────────────────────────
+   static:   Default. Normal flow. Offsets ignored.
+   relative: Normal flow + offset from original position. Space preserved.
+   absolute: Removed from flow. Relative to nearest positioned ancestor.
+   fixed:    Removed from flow. Relative to viewport. Doesn't scroll.
+   sticky:   Hybrid. Relative until scroll threshold, then fixed.
+*/
+
+
+/* Q2: What does "positioned ancestor" mean for absolute?
+   ──────────────────────────────────────────────────────────────
+   Any ancestor with position other than static.
+   Browser walks UP the DOM tree looking for one.
+   If none found, it uses the <html> element.
+   That's why we set parent to position: relative.
+*/
+
+
+/* Q3: How do you center an element with position absolute?
+   ────────────────────────────────────────────────────────────── */
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+/* Q4: What is the difference between fixed and sticky?
+   ──────────────────────────────────────────────────────────────
+   fixed:  Always fixed to viewport. Never scrolls.
+   sticky: Scrolls normally, then sticks at a threshold.
+           Stays within its parent container.
+*/
+
+
+/* Q5: Does z-index work on static elements?
+   ──────────────────────────────────────────────────────────────
+   NO. z-index only works on positioned elements
+   (relative, absolute, fixed, sticky).
+*/
+
+
+/* Q6: What is a stacking context?
+   ──────────────────────────────────────────────────────────────
+   A stacking context is a 3D conceptual layer.
+   z-index of children only competes WITHIN their parent context.
+   A child with z-index: 9999 inside parent z-index: 1
+   still loses to a sibling of parent with z-index: 2.
+
+   Created by: position + z-index, opacity < 1, transform,
+   filter, will-change, and others.
+*/
+
+
+/* Q7: Why does position: sticky sometimes not work?
+   ──────────────────────────────────────────────────────────────
+   Common reasons:
+   1. Missing top/bottom/left/right value
+   2. Parent has overflow: hidden, auto, or scroll
+   3. Parent is not tall enough for scrolling
+   4. An ancestor has overflow set
+*/
+
+
+/* Q8: What is the inset shorthand?
+   ────────────────────────────────────────────────────────────── */
+.overlay {
+  position: absolute;
+  inset: 0;            /* Same as: top:0; right:0; bottom:0; left:0; */
+}

@@ -1,0 +1,88 @@
+/* ============================================================
+   BOX MODEL & DISPLAY — DO's and DON'Ts
+   ============================================================ */
+
+
+/* ❌ DON'T: Forget box-sizing reset */
+.box { width: 200px; padding: 20px; border: 2px solid; }
+/* Actual width = 244px. Confusing math every time. */
+
+/* ✅ DO: Always reset box-sizing globally */
+*, *::before, *::after { box-sizing: border-box; }
+/* Now width: 200px means 200px total. Always. */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use display: none for accessible content */
+.sr-only { display: none; }
+/* Screen readers can't read this at all */
+
+/* ✅ DO: Use visually-hidden pattern for screen reader text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Set width/height on inline elements */
+span { width: 200px; height: 50px; }
+/* Completely ignored. Inline elements don't accept width/height. */
+
+/* ✅ DO: Use inline-block or block if you need sizing */
+span { display: inline-block; width: 200px; height: 50px; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Rely on margin for spacing between siblings without
+   understanding margin collapse */
+.box-a { margin-bottom: 30px; }
+.box-b { margin-top: 20px; }
+/* Gap = 30px, NOT 50px. Margins collapse. */
+
+/* ✅ DO: Use one direction for margin (margin-bottom only) */
+.box-a { margin-bottom: 30px; }
+.box-b { margin-bottom: 30px; }
+/* Or use gap in flex/grid — no collapse */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use negative margin to "fix" layout bugs */
+.broken { margin-top: -20px; }
+/* This is usually hiding a deeper layout problem */
+
+/* ✅ DO: Fix the root cause — padding, box-sizing, or layout method */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use width: 100% + padding on content-box */
+.child {
+  box-sizing: content-box;
+  width: 100%;
+  padding: 20px;
+}
+/* 100% + 40px padding = overflows parent! */
+
+/* ✅ DO: border-box prevents this entirely */
+.child {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 20px;
+  /* 100% total, content shrinks to fit */
+}

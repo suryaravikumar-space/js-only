@@ -1,0 +1,33 @@
+/* ============================================================
+   ch unit & line-height
+   ============================================================ */
+
+
+/* --- ch (Character Width) ---
+   1ch = width of the "0" character in current font
+   Perfect for limiting text width for readability
+   Optimal: 45-75 characters per line */
+
+.article {
+  max-width: 65ch;  /* ~65 characters per line — sweet spot */
+}
+
+
+/* --- line-height ---
+   ALWAYS use unitless values (no px, no em)
+   A unitless value multiplies by the element's own font-size */
+
+.text {
+  font-size: 1rem;
+  line-height: 1.5;   /* = 24px (1.5 × 16px) */
+}
+
+/* WHY unitless?
+   With px: line-height: 24px stays 24px even if child has larger font
+   With unitless: line-height: 1.5 recalculates for each element */
+
+.parent-bad  { font-size: 16px; line-height: 24px; }
+.child-bad   { font-size: 32px; /* line-height still 24px — text overlaps! */ }
+
+.parent-good { font-size: 16px; line-height: 1.5; }
+.child-good  { font-size: 32px; /* line-height = 48px (1.5 × 32) — correct! */ }

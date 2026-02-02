@@ -1,0 +1,78 @@
+/* ============================================================
+   FLEXBOX — Real-World Patterns
+   ============================================================ */
+
+
+/* --- Navbar --- */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+  height: 60px;
+}
+.navbar__logo { flex-shrink: 0; }
+.navbar__links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+
+/* --- Card Row (responsive) --- */
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.card-grid__item {
+  flex: 1 1 300px;     /* grow, shrink, minimum 300px */
+  /* Items are at least 300px, grow to fill, wrap when needed */
+}
+
+
+/* --- Sidebar Layout --- */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+.sidebar {
+  flex: 0 0 250px;     /* fixed 250px, no grow, no shrink */
+}
+.main-content {
+  flex: 1;             /* takes all remaining space */
+}
+
+
+/* --- Footer pushed to bottom --- */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.page__content {
+  flex: 1;             /* grows to push footer down */
+}
+.page__footer {
+  /* naturally sits at the bottom */
+}
+
+
+/* --- Center anything --- */
+.center-anything {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+
+/* --- Input with button --- */
+.search-bar {
+  display: flex;
+}
+.search-bar input {
+  flex: 1;             /* input takes remaining space */
+}
+.search-bar button {
+  flex-shrink: 0;      /* button keeps its size */
+}

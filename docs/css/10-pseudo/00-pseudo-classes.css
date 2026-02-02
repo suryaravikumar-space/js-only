@@ -1,0 +1,68 @@
+/* ============================================================
+   PSEUDO-CLASSES — Style elements based on STATE
+   ============================================================
+
+   Written with single colon  :name
+   They don't add new elements — they target existing ones
+   in a specific state or position.
+
+   ============================================================ */
+
+
+/* --- User action states --- */
+a:hover   { color: blue; }       /* mouse over */
+a:active  { color: red; }        /* being clicked */
+a:visited { color: purple; }     /* already visited link */
+
+button:focus { outline: 2px solid blue; }   /* keyboard focused */
+button:focus-visible { outline: 2px solid blue; }  /* focused by keyboard ONLY, not mouse */
+
+input:disabled { opacity: 0.5; }
+
+
+/* --- Form states --- */
+input:required { border-left: 3px solid red; }
+input:valid    { border-color: green; }
+input:invalid  { border-color: red; }
+input:checked  { /* for checkboxes/radio */ }
+input:placeholder-shown { /* when placeholder is visible (empty) */ }
+
+
+/* --- Structural (position-based) --- */
+li:first-child { font-weight: bold; }
+li:last-child  { border-bottom: none; }
+li:nth-child(2) { /* 2nd child */ }
+li:nth-child(odd)  { background: #f5f5f5; }   /* zebra stripes */
+li:nth-child(even) { background: white; }
+li:nth-child(3n)   { /* every 3rd: 3, 6, 9... */ }
+li:nth-child(3n+1) { /* 1, 4, 7, 10... */ }
+
+p:first-of-type { /* first <p> among siblings */ }
+p:last-of-type  { /* last <p> among siblings */ }
+
+.container:empty { display: none; }  /* element with no children */
+
+
+/* --- Negation --- */
+p:not(.special)     { color: gray; }
+input:not(:disabled) { cursor: pointer; }
+
+
+/* --- :is() and :where() (modern) --- */
+:is(h1, h2, h3) { line-height: 1.2; }
+/* Same as: h1, h2, h3 { line-height: 1.2; }
+   but shorter for complex selectors */
+
+:where(h1, h2, h3) { line-height: 1.2; }
+/* Same as :is() but specificity = 0 (easier to override) */
+
+
+/* --- :has() (parent selector — very powerful) --- */
+.card:has(img) {
+  /* Style cards that CONTAIN an image */
+  padding-top: 0;
+}
+.form:has(input:invalid) {
+  /* Style form when ANY input is invalid */
+  border-color: red;
+}

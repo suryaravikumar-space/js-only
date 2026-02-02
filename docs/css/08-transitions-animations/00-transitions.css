@@ -1,0 +1,76 @@
+/* ============================================================
+   CSS TRANSITIONS — Smooth changes between states
+   ============================================================
+
+   Transition = animate a property change over time.
+   Only works when a property CHANGES (hover, focus, class toggle).
+
+   Properties: transition-property, transition-duration,
+               transition-timing-function, transition-delay
+   ============================================================ */
+
+
+/* --- Basic transition --- */
+.button {
+  background: #333;
+  color: white;
+  padding: 0.75em 1.5em;
+  transition: background 0.3s ease;
+  /* When background changes, animate over 0.3 seconds */
+}
+
+.button:hover {
+  background: #007bff;
+  /* This change is now animated smoothly */
+}
+
+
+/* --- Multiple properties --- */
+.card {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+
+/* --- Shorthand ---
+   transition: property duration timing-function delay;
+*/
+.element {
+  transition: all 0.3s ease 0s;
+  /* all = any property that changes
+     0.3s = duration
+     ease = timing curve
+     0s = no delay */
+}
+
+/* AVOID transition: all in production — it's slow.
+   Always specify exact properties. */
+
+
+/* --- Timing Functions ---
+   ease:        slow → fast → slow (default)
+   linear:      constant speed
+   ease-in:     slow start
+   ease-out:    slow end
+   ease-in-out: slow start and end
+   cubic-bezier(x1,y1,x2,y2): custom curve
+*/
+
+.linear   { transition-timing-function: linear; }
+.ease-out { transition-timing-function: ease-out; }
+.custom   { transition-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+/* ^ this creates a "bounce" effect */
+
+
+/* --- What CAN be transitioned? ---
+   YES: color, background, opacity, transform, width, height,
+        margin, padding, border-color, box-shadow, font-size
+   NO:  display, font-family, background-image, position value
+   RULE: if a property has a numeric middle value, it can transition.
+*/

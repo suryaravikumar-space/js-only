@@ -1,0 +1,76 @@
+/* ============================================================
+   TRANSITIONS & ANIMATIONS — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: What is the difference between transition and animation?
+   ──────────────────────────────────────────────────────────────
+   Transition: needs a TRIGGER (hover, focus, class change).
+               Goes from state A → state B.
+   Animation:  runs automatically, can loop, can have
+               multiple keyframe steps (A → B → C → D).
+*/
+
+
+/* Q2: What is animation-fill-mode: forwards?
+   ──────────────────────────────────────────────────────────────
+   Without it: element snaps back to original state after animation.
+   With forwards: element KEEPS the final keyframe styles.
+*/
+
+
+/* Q3: Why should you animate transform and opacity instead of width/margin?
+   ──────────────────────────────────────────────────────────────
+   transform and opacity are GPU-accelerated (composited layer).
+   They don't trigger layout recalculation or repaint.
+   Animating width/margin causes expensive reflow on every frame.
+
+   GOOD: transform: translateX(), scale(), rotate(); opacity
+   BAD:  width, height, margin, top, left, padding
+*/
+
+
+/* Q4: What is will-change?
+   ──────────────────────────────────────────────────────────────
+   Hints the browser to optimize for upcoming changes.
+   Use sparingly — creates a new compositing layer (uses memory).
+*/
+.will-animate {
+  will-change: transform;  /* browser pre-optimizes for transform changes */
+}
+
+
+/* Q5: How do you pause a CSS animation?
+   ────────────────────────────────────────────────────────────── */
+.paused {
+  animation-play-state: paused;
+}
+
+
+/* Q6: What is cubic-bezier?
+   ──────────────────────────────────────────────────────────────
+   A custom timing function with 4 control points.
+   cubic-bezier(x1, y1, x2, y2)
+   ease = cubic-bezier(0.25, 0.1, 0.25, 1.0)
+   You can create bounce, elastic, or custom curves.
+*/
+
+
+/* Q7: How do you handle prefers-reduced-motion?
+   ────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* Q8: Can you animate display: none to display: block?
+   ──────────────────────────────────────────────────────────────
+   NO. display cannot be transitioned (no middle value).
+   Instead: animate opacity (0→1) and use visibility.
+   Or use the new @starting-style rule (modern CSS).
+*/

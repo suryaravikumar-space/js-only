@@ -1,0 +1,48 @@
+/* ============================================================
+   WHEN TO USE WHAT — Quick Reference
+   ============================================================
+
+   PROPERTY         | BEST UNIT    | WHY
+   -----------------|--------------|-----------------------------
+   font-size        | rem          | Accessible, no compounding
+   line-height      | unitless 1.5 | Scales with any font-size
+   padding/margin   | rem or em    | rem = consistent, em = scales with component
+   width            | %, vw        | Responsive
+   max-width        | rem, ch, px  | Constrain content
+   height           | avoid fixed! | Let content decide
+   border           | px           | Thin lines need precision
+   border-radius    | px or em     | px = fixed, em = scales
+   box-shadow       | px           | Visual detail
+   media queries    | em           | Handles zoom better than px
+
+   ============================================================ */
+
+
+/* REAL-WORLD: Responsive Card */
+.card {
+  width: 100%;
+  max-width: 40rem;           /* 640px max */
+  padding: 1.5rem;            /* 24px */
+  margin-bottom: 2rem;        /* 32px */
+  font-size: 1rem;            /* 16px */
+  line-height: 1.6;           /* unitless */
+  border: 1px solid #e0e0e0;  /* px for precision */
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card__title {
+  font-size: 1.5rem;          /* 24px */
+  margin-bottom: 0.75rem;
+}
+
+.card__text {
+  max-width: 65ch;            /* readable line width */
+}
+
+.card__button {
+  font-size: 1rem;
+  padding: 0.625em 1.25em;    /* em = scales with button font */
+  border: 2px solid currentColor;
+  border-radius: 0.25em;
+}

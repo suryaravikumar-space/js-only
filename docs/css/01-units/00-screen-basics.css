@@ -1,0 +1,41 @@
+/* ============================================================
+   HOW A SCREEN WORKS
+   ============================================================
+
+   Your screen is a grid of tiny dots called PIXELS.
+
+   A 1920x1080 screen:
+   - 1920 dots horizontally
+   - 1080 dots vertically
+   - Total: 2,073,600 tiny light-emitting dots
+
+   Each dot displays one color at a time.
+   Millions together = images, text, buttons.
+
+   ============================================================
+   KEY CONCEPTS
+   ============================================================
+
+   1. RESOLUTION — Total pixels on screen
+      1920x1080 (Full HD)  = ~2 million pixels
+      2560x1440 (2K)       = ~3.7 million pixels
+      3840x2160 (4K)       = ~8.3 million pixels
+
+   2. PPI (Pixels Per Inch) — How dense the pixels are
+      24-inch monitor at 1080p ≈ 92 PPI
+      iPhone 15              ≈ 460 PPI
+      Higher PPI = sharper text
+
+   3. VIEWPORT — Visible area of the browser window
+      Excludes browser toolbar, OS taskbar
+      Changes when user resizes browser
+
+   4. DPR (Device Pixel Ratio)
+      Regular monitor: DPR = 1 → 1 CSS px = 1 physical pixel
+      Retina display:  DPR = 2 → 1 CSS px = 4 physical pixels
+      Some phones:     DPR = 3 → 1 CSS px = 9 physical pixels
+
+      A 16px font on Retina uses 32 physical pixels.
+      Same visual size, but sharper.
+
+   ============================================================ */

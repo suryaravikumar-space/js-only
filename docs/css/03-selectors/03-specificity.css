@@ -1,0 +1,67 @@
+/* ============================================================
+   SPECIFICITY — How the browser decides which rule wins
+   ============================================================
+
+   When multiple rules target the same element,
+   the one with HIGHER SPECIFICITY wins.
+
+   Specificity is calculated as a 4-digit score:
+   (inline, IDs, classes, elements)
+
+   ============================================================ */
+
+
+/* SCORING:
+
+   Selector              | Score        | Why
+   ----------------------|--------------|---------------------------
+   *                     | 0,0,0,0      | Universal = 0
+   p                     | 0,0,0,1      | 1 element
+   p.intro               | 0,0,1,1      | 1 class + 1 element
+   p#main                | 0,1,0,1      | 1 ID + 1 element
+   div p.intro           | 0,0,1,2      | 1 class + 2 elements
+   #nav .list li a       | 0,1,1,2      | 1 ID + 1 class + 2 elements
+   style="color:red"     | 1,0,0,0      | Inline always wins (except !important)
+
+   REMEMBER:
+   - IDs (100) >> Classes (10) >> Elements (1)
+   - Even 100 classes can't beat 1 ID
+   - !important beats everything (avoid using it)
+*/
+
+
+/* EXAMPLE: Which color wins? */
+
+p          { color: blue; }     /* 0,0,0,1 */
+.text      { color: green; }    /* 0,0,1,0 ← wins over element */
+#intro     { color: red; }      /* 0,1,0,0 ← wins over class */
+
+/* Answer: red wins (highest specificity) */
+
+
+/* What counts as a "class-level" (0,0,1,0) selector?
+   - .classname
+   - [attribute]
+   - :pseudo-class (:hover, :focus, :nth-child, etc.)
+
+   What counts as "element-level" (0,0,0,1)?
+   - tagname (div, p, a)
+   - ::pseudo-element (::before, ::after)
+*/
+
+a:hover          { /* 0,0,1,1 (1 pseudo-class + 1 element) */ }
+.nav a:hover     { /* 0,0,2,1 (1 class + 1 pseudo-class + 1 element) */ }
+#nav a:hover     { /* 0,1,1,1 (1 ID + 1 pseudo-class + 1 element) */ }
+
+
+/* TIE-BREAKER: If specificity is equal, LAST rule wins */
+.text { color: blue; }
+.text { color: red; }   /* ← This wins (same specificity, later in file) */
+
+
+/* CASCADE ORDER (lowest to highest priority):
+   1. Browser default styles
+   2. Your CSS rules (specificity decides)
+   3. !important (overrides everything — avoid!)
+   4. !important in user stylesheet (accessibility)
+*/

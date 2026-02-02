@@ -1,0 +1,65 @@
+/* ============================================================
+   PSEUDO-CLASSES & PSEUDO-ELEMENTS — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: Difference between pseudo-class and pseudo-element?
+   ──────────────────────────────────────────────────────────────
+   Pseudo-class (:hover):     targets an existing element in a STATE
+   Pseudo-element (::before): creates a NEW virtual element
+
+   : single colon = pseudo-class
+   :: double colon = pseudo-element
+*/
+
+
+/* Q2: What is the :has() selector? Why is it called the parent selector?
+   ──────────────────────────────────────────────────────────────
+   :has() selects an element based on its CHILDREN.
+   .card:has(img) → selects .card only if it contains an <img>.
+   Before :has(), CSS could never select parents based on children.
+*/
+
+
+/* Q3: What is the difference between :nth-child and :nth-of-type?
+   ──────────────────────────────────────────────────────────────
+   :nth-child(2)    → 2nd child regardless of element type
+   :nth-of-type(2)  → 2nd child of that specific element type
+*/
+
+
+/* Q4: Can ::before and ::after work without content property?
+   ──────────────────────────────────────────────────────────────
+   NO. content is REQUIRED. Without it, the pseudo-element
+   doesn't render at all. Use content: '' for decorative elements.
+*/
+
+
+/* Q5: What is :focus-visible? How is it different from :focus?
+   ──────────────────────────────────────────────────────────────
+   :focus → applies when element is focused (by mouse OR keyboard)
+   :focus-visible → only applies when focused by KEYBOARD
+   Use :focus-visible to show outlines only for keyboard users.
+*/
+
+
+/* Q6: What is the difference between :is() and :where()?
+   ──────────────────────────────────────────────────────────────
+   Same behavior, different specificity.
+   :is(h1, h2) → specificity = highest selector inside (element)
+   :where(h1, h2) → specificity = 0 (always overridable)
+*/
+
+
+/* Q7: Can you use ::before on an <img> or <input>?
+   ──────────────────────────────────────────────────────────────
+   NO. Replaced elements (img, input, video, textarea) cannot
+   have ::before or ::after because they don't have content
+   that CSS can insert into.
+*/
+
+
+/* Q8: How do you create zebra-striped table rows?
+   ────────────────────────────────────────────────────────────── */
+tr:nth-child(odd)  { background: #f9f9f9; }
+tr:nth-child(even) { background: #ffffff; }

@@ -1,0 +1,120 @@
+/* ============================================================
+   FLEXBOX — Container Properties (Parent)
+   ============================================================
+
+   Flexbox = 1-dimensional layout (row OR column).
+   Set display: flex on the PARENT.
+   Children become "flex items" automatically.
+
+   TWO AXES:
+   - Main Axis:  direction items flow (default: horizontal →)
+   - Cross Axis: perpendicular to main (default: vertical ↓)
+
+   ============================================================ */
+
+
+/* Step 1: Enable flexbox */
+.container {
+  display: flex;
+  /* Children are now in a row by default */
+}
+
+
+/* --- flex-direction ---
+   Controls the MAIN AXIS direction.
+
+   row (default):    → left to right
+   row-reverse:      ← right to left
+   column:           ↓ top to bottom
+   column-reverse:   ↑ bottom to top
+*/
+
+.row    { flex-direction: row; }
+.col    { flex-direction: column; }
+
+
+/* --- justify-content ---
+   Aligns items along the MAIN AXIS.
+
+   ┌───────────────────────────────────┐
+   flex-start:    [A][B][C]            │
+   flex-end:      │            [A][B][C]
+   center:        │    [A][B][C]       │
+   space-between: [A]     [B]     [C]  │  ← equal space BETWEEN
+   space-around:  │ [A]  [B]  [C] │   │  ← equal space AROUND each
+   space-evenly:  │ [A]  [B]  [C] │   │  ← equal space EVERYWHERE
+   └───────────────────────────────────┘
+*/
+
+.center-items {
+  display: flex;
+  justify-content: center;
+}
+
+.spread-items {
+  display: flex;
+  justify-content: space-between;
+}
+
+
+/* --- align-items ---
+   Aligns items along the CROSS AXIS.
+
+   (For a row, cross axis is vertical)
+
+   stretch (default): items stretch to fill container height
+   flex-start:        items at the top
+   flex-end:          items at the bottom
+   center:            items vertically centered
+   baseline:          items aligned by their text baseline
+*/
+
+.vertical-center {
+  display: flex;
+  align-items: center;
+}
+
+
+/* --- THE HOLY GRAIL: Perfect centering --- */
+.perfect-center {
+  display: flex;
+  justify-content: center;   /* horizontal center */
+  align-items: center;       /* vertical center */
+}
+
+
+/* --- flex-wrap ---
+   By default, items try to fit in ONE line (nowrap).
+   wrap: items move to next line if they don't fit.
+*/
+
+.wrapping {
+  display: flex;
+  flex-wrap: wrap;
+  /* Items that don't fit will wrap to the next row */
+}
+
+
+/* --- gap ---
+   Space BETWEEN flex items (not on edges).
+   Modern replacement for margin hacks.
+*/
+
+.with-gap {
+  display: flex;
+  gap: 16px;              /* 16px between all items */
+  /* or: row-gap: 16px; column-gap: 8px; */
+}
+
+
+/* --- align-content ---
+   Only works with flex-wrap: wrap (multiple rows).
+   Aligns the ROWS along the cross axis.
+   Same values as justify-content.
+*/
+
+.multi-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: space-between;  /* distributes rows vertically */
+}

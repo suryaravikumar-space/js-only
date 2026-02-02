@@ -1,0 +1,58 @@
+/* ============================================================
+   CSS GRID — DO's and DON'Ts
+   ============================================================ */
+
+
+/* ❌ DON'T: Use grid for simple one-direction layouts */
+.nav { display: grid; grid-template-columns: repeat(5, auto); }
+/* Overkill for a simple horizontal nav */
+
+/* ✅ DO: Use flexbox for 1D layouts */
+.nav { display: flex; gap: 1rem; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Hardcode column counts for responsive layouts */
+.grid { grid-template-columns: repeat(3, 1fr); }
+/* Always 3 columns — breaks on small screens */
+
+/* ✅ DO: Use auto-fit + minmax for responsive grids */
+.grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+/* Automatically adjusts column count based on available space */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Mix grid placement with float */
+.grid { display: grid; }
+.grid-item { float: left; }
+/* float is ignored in grid context but confusing to read */
+
+/* ✅ DO: Use only grid properties for placement */
+.grid-item { grid-column: span 2; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use px for all grid tracks */
+.layout { grid-template-columns: 250px 750px 250px; }
+/* Not responsive, breaks on smaller screens */
+
+/* ✅ DO: Mix fr with fixed values */
+.layout { grid-template-columns: 250px 1fr 250px; }
+/* Sidebar fixed, main content fills remaining space */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Forget gap exists — don't use margins on grid items */
+.grid-item { margin: 8px; }
+/* Uneven edges, outer margins push against container */
+
+/* ✅ DO: Use gap on the container */
+.grid { display: grid; gap: 16px; }

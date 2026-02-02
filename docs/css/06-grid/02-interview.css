@@ -1,0 +1,88 @@
+/* ============================================================
+   CSS GRID — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: When to use Grid vs Flexbox?
+   ──────────────────────────────────────────────────────────────
+   Flexbox: 1D layout (nav bars, card rows, centering)
+   Grid:    2D layout (page layouts, dashboards, image galleries)
+
+   Use BOTH together:
+   Grid for the page layout, Flexbox for component internals.
+*/
+
+
+/* Q2: What is the fr unit?
+   ──────────────────────────────────────────────────────────────
+   fr = fraction of REMAINING space after fixed sizes.
+   grid-template-columns: 200px 1fr 2fr;
+   → 200px fixed, then remaining space split 1:2.
+*/
+
+
+/* Q3: What is the difference between auto-fill and auto-fit?
+   ──────────────────────────────────────────────────────────────
+   Both create as many columns as fit.
+   auto-fill: keeps empty tracks (extra space remains empty)
+   auto-fit:  collapses empty tracks (items stretch to fill)
+
+   In most cases, auto-fit is what you want.
+*/
+
+
+/* Q4: How do you make a responsive grid without media queries?
+   ────────────────────────────────────────────────────────────── */
+.responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+
+/* Q5: What is grid-template-areas?
+   ──────────────────────────────────────────────────────────────
+   A visual way to define grid layout using named areas.
+   Each string is a row. Names map to grid-area on children.
+   Use "." for empty cells.
+*/
+.layout {
+  grid-template-areas:
+    "header header"
+    "nav    main"
+    ".      footer";   /* dot = empty cell */
+}
+
+
+/* Q6: How do you span an item across multiple columns?
+   ────────────────────────────────────────────────────────────── */
+.span-two {
+  grid-column: span 2;     /* spans 2 columns */
+}
+.full-row {
+  grid-column: 1 / -1;     /* full width (-1 = last line) */
+}
+
+
+/* Q7: What is the difference between justify-items and justify-content in Grid?
+   ──────────────────────────────────────────────────────────────
+   justify-items:   aligns items WITHIN their cells
+   justify-content: aligns the entire GRID within its container
+*/
+
+
+/* Q8: Can grid items overlap?
+   ──────────────────────────────────────────────────────────────
+   YES. Unlike flexbox, grid items can be placed on overlapping
+   cells. Use z-index to control which is on top.
+*/
+.item-a { grid-row: 1/3; grid-column: 1/3; z-index: 1; }
+.item-b { grid-row: 2/4; grid-column: 2/4; z-index: 2; } /* overlaps and on top */
+
+
+/* Q9: What does minmax() do?
+   ──────────────────────────────────────────────────────────────
+   Sets a minimum and maximum size for a track.
+   minmax(200px, 1fr) → at least 200px, grows up to 1fr.
+   minmax(0, auto)    → shrinks to 0, grows to fit content.
+*/

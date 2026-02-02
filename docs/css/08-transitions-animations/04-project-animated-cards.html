@@ -1,0 +1,285 @@
+<!-- ============================================================
+     MINI PROJECT: Animated Cards with Loading Spinner
+     SKILLS: transitions, keyframes, animation, timing functions,
+             staggered delays, fill-mode, hover effects
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Cards — Transitions & Animations Project</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f5f5;
+      padding: 2rem;
+    }
+
+    h2 { margin-bottom: 1.5rem; color: #333; }
+
+
+    /* ===== KEYFRAMES =====
+
+       @keyframes defines the animation STEPS.
+       The browser creates smooth in-between frames.
+
+       slideUp:
+       - from (0%): 30px below normal + invisible
+       - to (100%): normal position + fully visible
+       The browser fills in frames 1%-99% automatically.
+    */
+    @keyframes slideUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /*
+       spin:
+       - Only has "to" (same as "from" being the current state).
+       - Rotates from 0deg to 360deg = full circle.
+       - With animation: ... infinite → loops forever.
+    */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /*
+       pulse:
+       - 3 steps: normal → bigger → normal.
+       - 0% and 100% are the same (scale 1) = seamless loop.
+       - 50% = midpoint, slightly bigger.
+    */
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.05); }
+    }
+
+
+    /* ===== CARD GRID ===== */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+
+    /* ===== ANIMATED CARD =====
+
+       animation: slideUp 0.6s ease-out forwards;
+       - slideUp   → uses the @keyframes slideUp defined above
+       - 0.6s      → takes 600 milliseconds
+       - ease-out  → starts fast, slows down at the end
+                     (feels natural, like something landing)
+       - forwards  → KEEPS the final state after animation ends.
+                     Without it, card snaps back to opacity: 0.
+
+       opacity: 0;
+       - Card starts invisible (matches the 'from' keyframe).
+       - Without this, card flashes visible for 1 frame before animation.
+    */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      opacity: 0;
+      animation: slideUp 0.6s ease-out forwards;
+
+      /*
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        - This is for the HOVER effect, separate from the entrance animation.
+        - Animation = automatic on load.
+        - Transition = needs a trigger (hover).
+        - We specify exact properties (not "all") for performance.
+      */
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /*
+       STAGGERED ANIMATION with animation-delay.
+       Each card appears slightly after the previous one.
+       Creates a "cascade" / "waterfall" entrance effect.
+
+       :nth-child(1) → 0s delay (appears first)
+       :nth-child(2) → 0.1s delay (appears 100ms later)
+       :nth-child(3) → 0.2s delay (appears 200ms later)
+       :nth-child(4) → 0.3s delay
+
+       The eye follows the motion from first to last.
+    */
+    .card:nth-child(1) { animation-delay: 0s; }
+    .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.15s; }
+    .card:nth-child(4) { animation-delay: 0.2s; }
+
+    /*
+       HOVER EFFECT using transition (not animation).
+       - transform: translateY(-4px) → lifts card 4px up.
+         translateY is GPU-accelerated (no layout recalculation).
+         Using margin-top: -4px would cause reflow = jank.
+       - box-shadow deepens → creates "floating" illusion.
+       - Transition on base state means it animates BOTH ways
+         (hover in = lifts, hover out = settles back).
+    */
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .card__title {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card__text {
+      color: #666;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+
+    /* ===== BUTTON WITH TRANSITION =====
+
+       transition is on the BASE state (.btn), not on :hover.
+       This makes it animate BOTH directions:
+       - Hover in: background slides to darker blue
+       - Hover out: background slides back to original
+
+       If transition was on :hover only, hover-out would snap instantly.
+    */
+    .btn {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.5rem 1.25rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    /*
+      :active = the moment the button is being CLICKED (mouse down).
+      scale(0.97) = shrinks slightly = "press" feedback.
+      Released instantly after mouse up because of the transition.
+    */
+    .btn:hover { background: #0056b3; }
+    .btn:active { transform: scale(0.97); }
+
+
+    /* ===== LOADING SPINNER =====
+
+       animation: spin 0.8s linear infinite;
+       - spin      → @keyframes spin (0 → 360deg rotation)
+       - 0.8s      → one full rotation takes 800ms
+       - linear    → constant speed (no acceleration/deceleration)
+                     ease would make it speed up and slow down
+                     each rotation — looks wrong for a spinner.
+       - infinite  → loops forever until removed from DOM.
+
+       Border trick:
+       - border: 4px solid #eee → light gray circle
+       - border-top-color: #007bff → ONLY top segment is blue
+       - As it spins, the blue segment appears to chase around the circle.
+    */
+    .spinner-section {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #eee;
+      border-top-color: #007bff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 1rem auto;
+    }
+
+
+    /* ===== PULSE BADGE =====
+
+       animation: pulse 2s ease-in-out infinite;
+       - pulse        → @keyframes pulse (scale 1 → 1.05 → 1)
+       - 2s           → slow pulse, one cycle every 2 seconds
+       - ease-in-out  → slow start, fast middle, slow end
+                        Creates a natural "breathing" feel.
+       - infinite     → pulses forever (draws attention).
+    */
+    .badge {
+      display: inline-block;
+      background: #dc3545;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+
+    /* ===== ACCESSIBILITY =====
+
+       Disables animations for users who enabled
+       "Reduce motion" in their OS settings.
+
+       Uses 0.01ms (not 0) because some browsers
+       treat 0 as "no animation" which can break
+       animation-fill-mode: forwards.
+    */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Animated Cards <span class="badge">New</span></h2>
+
+  <div class="cards">
+    <div class="card">
+      <h3 class="card__title">Slide Up Entrance</h3>
+      <p class="card__text">This card slides up and fades in on page load using @keyframes with animation-fill-mode: forwards.</p>
+      <button class="btn">Learn More</button>
+    </div>
+    <div class="card">
+      <h3 class="card__title">Staggered Delay</h3>
+      <p class="card__text">Each card has a slightly longer animation-delay, creating a cascade effect from left to right.</p>
+      <button class="btn">Learn More</button>
+    </div>
+    <div class="card">
+      <h3 class="card__title">Hover Transition</h3>
+      <p class="card__text">Hover over any card to see the lift effect. Uses transform + box-shadow transition (GPU-accelerated).</p>
+      <button class="btn">Learn More</button>
+    </div>
+    <div class="card">
+      <h3 class="card__title">Button Feedback</h3>
+      <p class="card__text">The button changes color on hover and shrinks slightly on click (:active). Try it!</p>
+      <button class="btn">Click Me</button>
+    </div>
+  </div>
+
+  <div class="spinner-section">
+    <h2>Loading Spinner</h2>
+    <div class="spinner"></div>
+    <p style="color: #888; font-size: 0.85rem;">border trick + @keyframes spin + animation: infinite linear</p>
+  </div>
+
+</body>
+</html>

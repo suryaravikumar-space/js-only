@@ -1,0 +1,224 @@
+<!-- ============================================================
+     MINI PROJECT: Dashboard Layout
+     SKILLS: flex container, flex items, gap, margin-left:auto,
+             flex-wrap, flex-grow, flex-shrink, flex-basis
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Flexbox Project</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f0f2f5; color: #333; }
+
+
+    /* ===== NAVBAR =====
+       flex → children sit in a row.
+       align-items: center → vertically centered.
+       justify-content is NOT used here — we use margin-left: auto instead.
+    */
+    .navbar {
+      display: flex;
+      align-items: center;
+      height: 56px;
+      background: #1a1a2e;
+      color: white;
+      padding: 0 1.5rem;
+      gap: 1rem;               /* 1rem space between nav items */
+    }
+
+    /* .navbar__logo — no special flex needed, sits first naturally */
+    .navbar__logo {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    /* margin-left: auto pushes .navbar__user to the FAR RIGHT.
+       It consumes all remaining space as left margin. */
+    .navbar__user {
+      margin-left: auto;
+      font-size: 0.85rem;
+    }
+
+
+    /* ===== PAGE LAYOUT =====
+       flex on the page body: sidebar + main side by side.
+       min-height: calc(100vh - 56px) = fill remaining screen after navbar.
+    */
+    .page {
+      display: flex;
+      min-height: calc(100vh - 56px);
+    }
+
+    /* flex: 0 0 220px means:
+       flex-grow: 0 → don't grow (sidebar stays 220px)
+       flex-shrink: 0 → don't shrink (sidebar stays 220px)
+       flex-basis: 220px → starting size is 220px
+    */
+    .sidebar {
+      flex: 0 0 220px;
+      background: #16213e;
+      color: #ccc;
+      padding: 1.5rem 1rem;
+    }
+
+    .sidebar__item {
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.25rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .sidebar__item:hover { background: rgba(255,255,255,0.1); }
+    .sidebar__item.active { background: #007bff; color: white; }
+
+    /* flex: 1 means:
+       flex-grow: 1 → takes ALL remaining space
+       flex-shrink: 1 → can shrink if needed
+       flex-basis: 0% → starts from 0, then grows
+    */
+    .main {
+      flex: 1;
+      padding: 1.5rem;
+    }
+
+
+    /* ===== STAT CARDS ROW =====
+       flex + flex-wrap: wrap → items wrap to next line on small screens.
+       gap: 1rem → consistent spacing between cards.
+    */
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* flex: 1 1 200px means:
+       flex-grow: 1 → grows to fill space
+       flex-shrink: 1 → shrinks if needed
+       flex-basis: 200px → minimum 200px before wrapping
+
+       4 cards × 200px = 800px minimum.
+       If container < 800px, cards wrap to next row.
+    */
+    .stat-card {
+      flex: 1 1 200px;
+      background: white;
+      padding: 1.25rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .stat-card__label {
+      font-size: 0.8rem;
+      color: #888;
+      text-transform: uppercase;
+    }
+
+    .stat-card__value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-top: 0.25rem;
+    }
+
+
+    /* ===== CONTENT ROW: chart + recent activity =====
+       flex with gap. Two columns: chart takes more space.
+    */
+    .content-row {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    /* flex: 2 → takes 2 parts of available space */
+    .chart {
+      flex: 2;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      min-height: 250px;
+    }
+
+    /* flex: 1 → takes 1 part (chart is 2x wider) */
+    .activity {
+      flex: 1;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .activity__item {
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.85rem;
+    }
+
+    .activity__item:last-child { border-bottom: none; }
+
+    h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <span class="navbar__logo">Dashboard</span>
+    <span class="navbar__user">Hello, Surya</span>
+  </nav>
+
+  <div class="page">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar__item active">Overview</div>
+      <div class="sidebar__item">Analytics</div>
+      <div class="sidebar__item">Users</div>
+      <div class="sidebar__item">Settings</div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+      <!-- STAT CARDS -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-card__label">Total Users</div>
+          <div class="stat-card__value">12,847</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Revenue</div>
+          <div class="stat-card__value">$48.2k</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Orders</div>
+          <div class="stat-card__value">1,024</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Growth</div>
+          <div class="stat-card__value">+12.5%</div>
+        </div>
+      </div>
+
+      <!-- CHART + ACTIVITY -->
+      <div class="content-row">
+        <div class="chart">
+          <h2>Revenue Chart</h2>
+          <p style="color:#aaa;">Chart placeholder — flex: 2 takes 2/3 width</p>
+        </div>
+        <div class="activity">
+          <h2>Recent Activity</h2>
+          <div class="activity__item">User signup — 2 min ago</div>
+          <div class="activity__item">New order #1024 — 15 min ago</div>
+          <div class="activity__item">Payment received — 1 hr ago</div>
+          <div class="activity__item">Server restart — 3 hrs ago</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>

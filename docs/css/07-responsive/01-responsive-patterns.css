@@ -1,0 +1,62 @@
+/* ============================================================
+   RESPONSIVE PATTERNS — Real-world techniques
+   ============================================================ */
+
+
+/* --- Responsive Images --- */
+img {
+  max-width: 100%;      /* never overflow container */
+  height: auto;         /* maintain aspect ratio */
+  display: block;       /* remove inline gap below image */
+}
+
+
+/* --- Responsive Typography with clamp() --- */
+h1 {
+  font-size: clamp(1.8rem, 4vw, 3.5rem);
+  /* min: 28.8px, scales with viewport, max: 56px */
+}
+
+p {
+  font-size: clamp(1rem, 1.2vw, 1.25rem);
+}
+
+
+/* --- Container Queries (modern CSS) ---
+   Style based on PARENT size, not viewport size.
+   More useful for reusable components.
+*/
+
+.card-wrapper {
+  container-type: inline-size;  /* enable container queries */
+}
+
+@container (min-width: 400px) {
+  .card {
+    display: flex;       /* horizontal layout in larger container */
+  }
+}
+
+@container (max-width: 399px) {
+  .card {
+    display: block;      /* stacked layout in smaller container */
+  }
+}
+
+
+/* --- Responsive Grid (no media queries needed) --- */
+.auto-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+
+/* --- Hide/show based on screen --- */
+.mobile-only  { display: block; }
+.desktop-only { display: none; }
+
+@media (min-width: 768px) {
+  .mobile-only  { display: none; }
+  .desktop-only { display: block; }
+}

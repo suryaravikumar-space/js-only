@@ -1,0 +1,67 @@
+/* ============================================================
+   RESPONSIVE DESIGN — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: What is mobile-first design?
+   ──────────────────────────────────────────────────────────────
+   Write base CSS for mobile, then use min-width media queries
+   to add styles for larger screens.
+   Better for performance: mobile loads less CSS.
+   Opposite = desktop-first (uses max-width, loads everything).
+*/
+
+
+/* Q2: What is the viewport meta tag? Why is it needed?
+   ──────────────────────────────────────────────────────────────
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   Without it, mobile browsers render page at desktop width (~980px)
+   and zoom out. This tag makes it use actual device width.
+*/
+
+
+/* Q3: What is the difference between min-width and max-width in media queries?
+   ──────────────────────────────────────────────────────────────
+   min-width: 768px → applies at 768px AND ABOVE (mobile-first ✓)
+   max-width: 768px → applies at 768px AND BELOW (desktop-first)
+*/
+
+
+/* Q4: What are container queries? How are they different from media queries?
+   ──────────────────────────────────────────────────────────────
+   Media queries:     based on VIEWPORT size
+   Container queries: based on PARENT element size
+
+   Container queries are better for reusable components
+   that may appear in different-sized containers.
+*/
+
+
+/* Q5: How do you make images responsive?
+   ────────────────────────────────────────────────────────────── */
+img { max-width: 100%; height: auto; }
+
+
+/* Q6: What is clamp() and how is it used for responsive typography?
+   ──────────────────────────────────────────────────────────────
+   clamp(min, preferred, max)
+   font-size: clamp(1rem, 2.5vw, 3rem);
+   → at least 1rem, scales with viewport, never exceeds 3rem.
+   No media queries needed for responsive fonts.
+*/
+
+
+/* Q7: What is prefers-reduced-motion?
+   ──────────────────────────────────────────────────────────────
+   A media query that detects if user has enabled "reduce motion"
+   in their OS settings. You should disable animations for
+   accessibility when this is set.
+*/
+
+
+/* Q8: Should you use px or em for media query breakpoints?
+   ──────────────────────────────────────────────────────────────
+   em is better. When user zooms the browser, em-based breakpoints
+   trigger correctly. px breakpoints don't account for zoom.
+   @media (min-width: 48em) instead of (min-width: 768px)
+*/

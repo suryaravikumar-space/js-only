@@ -1,0 +1,74 @@
+/* ============================================================
+   CSS VARIABLES (Custom Properties)
+   ============================================================
+
+   Define reusable values with --name.
+   Use them with var(--name).
+   Scope: cascade down to children (like normal CSS).
+
+   ============================================================ */
+
+
+/* Define on :root for global access */
+:root {
+  --color-primary: #007bff;
+  --color-secondary: #6c757d;
+  --color-text: #333;
+  --color-bg: #fff;
+  --font-body: 'Inter', sans-serif;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+  --radius: 8px;
+}
+
+
+/* Use with var() */
+.button {
+  background: var(--color-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+}
+
+
+/* Fallback value (if variable is undefined) */
+.card {
+  color: var(--color-text, #000);
+  /*                       ^ fallback if --color-text doesn't exist */
+}
+
+
+/* Override in a scope — cascades to children */
+.dark-section {
+  --color-text: #eee;
+  --color-bg: #1a1a1a;
+  /* All children of .dark-section now use these values */
+}
+
+
+/* DARK MODE with variables */
+:root {
+  --bg: #ffffff;
+  --text: #333333;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a1a;
+    --text: #eeeeee;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  /* Automatically switches based on OS preference */
+}
+
+
+/* Variables can reference other variables */
+:root {
+  --blue-500: #007bff;
+  --color-primary: var(--blue-500);
+}

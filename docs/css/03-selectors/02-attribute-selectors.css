@@ -1,0 +1,44 @@
+/* ============================================================
+   ATTRIBUTE SELECTORS — Target elements by their attributes
+   ============================================================ */
+
+
+/* Has attribute (any value) */
+[disabled] { opacity: 0.5; }
+a[target] { color: red; }           /* any <a> with a target attribute */
+
+
+/* Exact value */
+input[type="text"] { border: 1px solid #ccc; }
+a[target="_blank"] { /* opens in new tab */ }
+
+
+/* Starts with ^= */
+a[href^="https"] { color: green; }  /* links starting with https */
+a[href^="tel:"] { color: blue; }    /* phone links */
+
+
+/* Ends with $= */
+a[href$=".pdf"] { /* PDF links */ }
+a[href$=".jpg"] { /* JPG image links */ }
+
+
+/* Contains *= */
+a[href*="google"] { /* any link containing "google" */ }
+
+
+/* REAL-WORLD: Style external links differently */
+a[href^="http"]:not([href*="mysite.com"]) {
+  /* External links — add an icon or different color */
+  color: orange;
+}
+
+/* REAL-WORLD: Style required form fields */
+input[required] {
+  border-left: 3px solid red;
+}
+
+input[type="email"],
+input[type="password"] {
+  font-family: monospace;
+}

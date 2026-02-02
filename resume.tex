@@ -1,0 +1,201 @@
+%-------------------------
+% Resume in Latex
+% Author : Surya Ravikumar
+% Modified & Fixed
+%------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+%-------------------------
+% Packages
+%-------------------------
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{svg.path}
+\input{glyphtounicode}
+
+\pdfgentounicode=1
+
+%-------------------------
+% Page Setup
+%-------------------------
+\addtolength{\oddsidemargin}{-0.6in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1.19in}
+\addtolength{\topmargin}{-.7in}
+\addtolength{\textheight}{1.4in}
+
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+\setlength{\multicolsep}{-3pt}
+\setlength{\columnsep}{-1pt}
+
+%-------------------------
+% Section Formatting (NO BOLD, NO COLOR)
+%-------------------------
+\titleformat{\section}
+  {\vspace{-4pt}\raggedright\large\normalfont}
+  {}
+  {0pt}
+  {}
+  [\titlerule \vspace{-5pt}]
+
+%-------------------------
+% Custom Commands
+%-------------------------
+\newcommand{\resumeItem}[1]{
+  \item\small{#1 \vspace{-2pt}}
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+  \begin{tabular*}{1.0\textwidth}[t]{l@{\extracolsep{\fill}}r}
+    \textbf{\large #1} & \textbf{\small #2} \\
+    \textit{\large #3} & \textit{\small #4} \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+  \item
+  \begin{tabular*}{1.0\textwidth}{l@{\extracolsep{\fill}}r}
+    \small #1 & \textbf{\small #2} \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0in,label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[itemsep=1pt, topsep=2pt]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+\renewcommand\labelitemi{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+%-------------------------------------------
+% Resume Starts Here
+%-------------------------------------------
+\begin{document}
+\sloppy
+
+%-------------------------
+% Header
+%-------------------------
+\begin{center}
+  {\Huge \textbf{SURYA RAVIKUMAR}} \\ \vspace{2pt}
+  Hyderabad, India \\ \vspace{2pt}
+  \small
+  \href{tel:+9012345678}{\faPhone\ +91 9012345678} \quad
+  \href{mailto:suryaravikumar1729@gmail.com}{\faEnvelope\ suryaravikumar1729@gmail.com} \quad
+  \href{https://www.linkedin.com/in/suryaravikumar/}{\faLinkedin\ LinkedIn} \quad
+  \href{https://github.com/suryaravikumar-space}{\faGithub\ GitHub}
+\end{center}
+
+%-------------------------
+% Objective
+%-------------------------
+\section{OBJECTIVE}
+\vspace{-2pt}
+\small
+Software Engineer with ~4 years of industry experience specializing in front-end development with \textbf{React.js (3+ years)} and \textbf{Next.js}, using JavaScript and TypeScript. Proficient in building responsive, scalable, and performance-oriented user interfaces leveraging \textbf{Next.js features including SSR, SSG, and file-based routing}, alongside \textbf{Redux}, \textbf{HTML5}, and \textbf{CSS3}. Experienced in consuming and designing \textbf{RESTful APIs}, writing clean and secure JavaScript code, and validating application quality through \textbf{JavaScript testing}. Skilled in modern development workflows using \textbf{Git} and \textbf{Jira} within Agile teams. Committed to delivering production-ready, maintainable front-end solutions for remote-first teams.
+
+%-------------------------
+% Technical Skills
+%-------------------------
+\section{TECHNICAL SKILLS}
+\vspace{-2pt}
+\begin{itemize}[leftmargin=0.15in, label={}, itemsep=1pt, topsep=0pt, parsep=0pt]
+\small
+\item \textbf{Programming Languages:} \textbf{JavaScript}, \textbf{TypeScript}, Java, SQL
+\item \textbf{Frontend:} \textbf{React}, \textbf{Next.js (SSR, SSG, ISR, API Routes)}, \textbf{Redux}, HTML5, CSS3, Tailwind CSS
+\item \textbf{Testing:} Jest, React Testing Library, Playwright
+\item \textbf{Backend Runtime \& Frameworks:} Node.js, Express.js, RESTful APIs
+\item \textbf{Databases:} PostgreSQL, MongoDB
+\item \textbf{Tools \& Platforms:} Git, GitHub, Jira, AWS, Vercel, Docker, Linux
+\item \textbf{Development Practices:} Agile/Scrum, SDLC, Test-Driven Development (TDD), Code Reviews
+\end{itemize}
+\vspace{-8pt}
+
+
+%-------------------------
+% Experience
+%-------------------------
+\section{EXPERIENCE}
+\resumeSubHeadingListStart
+
+\resumeSubheading
+{Karhan Software Pvt Ltd}{10/2024 -- Present}
+{Software Engineer}{Hybrid}
+\resumeItemListStart
+\resumeItem{Developed and maintained a content-driven web platform using \textbf{Next.js (Page Router)} with \textbf{SSR, SSG, and dynamic routing}, \textbf{TypeScript}, building reusable \textbf{React} components with semantic \textbf{HTML5} and \textbf{CSS3}, and integrating with \textbf{RESTful APIs} and \textbf{Next.js API routes}.}
+\resumeItem{Contributed to AI-enabled features by integrating frontend workflows with \textbf{LLM-based agent systems} (Google ADK), supporting use cases such as interactive learning experiences and intelligent content feedback.}
+\resumeItem{Worked on a SaaS analytics platform implementing \textbf{role-based access control (RBAC)}, real-time updates using \textbf{WebSockets}, and \textbf{Redux}-based state management, collaborating in a code-review–driven engineering culture using \textbf{Git} and \textbf{Jira}.}
+\resumeItemListEnd
+
+\resumeSubheading
+{Fint Solutions}{02/2022 -- 10/2024}
+{Associate Software Engineer}{Hybrid}
+\resumeItemListStart
+\resumeItem{Built and maintained a large-scale loan processing application using \textbf{React}, \textbf{JavaScript}, and \textbf{Redux}, developing multi-stage workflow UIs with responsive layouts using \textbf{HTML5} and \textbf{CSS3}.}
+\resumeItem{Consumed and integrated \textbf{RESTful APIs} built with \textbf{Node.js} to support data-driven loan operations such as application tracking, status updates, and workflow transitions.}
+\resumeItem{Wrote and maintained frontend tests using \textbf{Playwright} and contributed to \textbf{JavaScript testing} practices, improving release quality and ensuring UI stability across feature releases.}
+\resumeItemListEnd
+
+
+\resumeSubheading
+{Fint Solutions}{11/2021 -- 02/2022}
+{Software Developer Intern}{Remote}
+\resumeItemListStart
+\resumeItem{Completed intensive training covering the full SDLC from requirements to deployment.}
+\resumeItem{Developed backend modules using Java with strong OOP principles.}
+\resumeItem{Built responsive user interfaces using \textbf{React} and \textbf{Redux} with \textbf{HTML5/CSS3}.}
+\resumeItem{Worked in Agile/Scrum teams using \textbf{Git} and \textbf{Jira}.}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-------------------------
+% Projects
+%-------------------------
+\section{PROJECTS}
+\resumeSubHeadingListStart
+
+\resumeProjectHeading
+{\textbf{LARC.in – Lamakhan Amateur Radio Club} $|$ MERN, Tailwind, Cashfree, Vercel}{06/2025 -- 09/2025}
+\resumeItemListStart
+\resumeItem{Built subscription-based member management with admin-controlled pricing and automated payments.}
+\resumeItem{Implemented event management with Cashfree integration.}
+\resumeItem{Live platform deployed on Vercel with MongoDB backend. \href{https://larc.in}{(Live)}}
+\resumeItemListEnd
+
+\resumeProjectHeading
+{\textbf{MDX-UI (npm package)} $|$ Next.js, Tailwind, GitHub Registry}{2025}
+\resumeItemListStart
+\resumeItem{Built and published an open-source CLI tool to scaffold MDX components using a single command.}
+\resumeItem{Architected a Turborepo monorepo with pnpm workspaces and shared TypeScript configs.}
+\resumeItem{Demo: \href{https://mdx-ui-eight.vercel.app/}{Link} \quad GitHub: \href{https://github.com/ida02pingala06}{Repo}}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-------------------------
+% Education
+%-------------------------
+\section{EDUCATION}
+\resumeSubHeadingListStart
+\resumeSubheading
+{Vidya Jyothi Institute of Technology}{2016 -- 2020}
+{B.Tech – Electrical and Electronics Engineering (CGPA: 6.00)}{Hyderabad}
+\resumeSubHeadingListEnd
+
+\end{document}

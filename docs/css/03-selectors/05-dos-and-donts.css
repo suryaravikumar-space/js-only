@@ -1,0 +1,79 @@
+/* ============================================================
+   SELECTORS & SPECIFICITY — DO's and DON'Ts
+   ============================================================ */
+
+
+/* ❌ DON'T: Use IDs for styling */
+#header { background: blue; }
+/* IDs have very high specificity — hard to override later.
+   IDs are for JS hooks and anchor links, not CSS. */
+
+/* ✅ DO: Use classes for styling */
+.header { background: blue; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Over-qualify selectors */
+div.container ul.nav li.nav-item a.nav-link { color: blue; }
+/* Too specific, too fragile. Breaks if HTML structure changes. */
+
+/* ✅ DO: Keep selectors short and flat */
+.nav-link { color: blue; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use !important to fix specificity wars */
+.button { color: red !important; }
+/* Creates a new war — now you need !important everywhere. */
+
+/* ✅ DO: Increase specificity intentionally or restructure */
+.card .button { color: red; }
+/* Or use a more specific class: .button--danger { color: red; } */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use element selectors for components */
+div { padding: 20px; }
+/* Targets EVERY div on the page! */
+
+/* ✅ DO: Use specific class names */
+.card { padding: 20px; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Nest selectors too deeply */
+.page .main .content .sidebar .widget .title { font-size: 1rem; }
+/* 6 levels deep. Fragile, high specificity, hard to maintain. */
+
+/* ✅ DO: Max 2-3 levels deep */
+.widget__title { font-size: 1rem; }
+/* BEM naming: Block__Element--Modifier */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use * (universal) for complex styles */
+* { padding: 20px; font-size: 16px; }
+/* Applies to EVERYTHING — performance hit, unexpected results */
+
+/* ✅ DO: Use * only for resets */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Rely on source order to override styles */
+/* File order is fragile — refactoring can break everything */
+
+/* ✅ DO: Use proper specificity or CSS layers */
+@layer base, components, overrides;

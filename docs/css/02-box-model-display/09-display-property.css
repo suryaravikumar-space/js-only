@@ -1,0 +1,97 @@
+/* ============================================================
+   DISPLAY PROPERTY — Controls how an element behaves in layout
+   ============================================================
+
+   Every HTML element has a DEFAULT display value.
+   You can override it with CSS.
+
+   ============================================================ */
+
+
+/* --- block ---
+   Takes FULL WIDTH available.
+   Starts on a NEW LINE.
+   You CAN set width, height, margin, padding.
+
+   Default block elements: div, p, h1-h6, section, article, ul, li
+*/
+
+.block-example {
+  display: block;
+  width: 300px;       /* works */
+  height: 100px;      /* works */
+  margin: 20px;       /* works on all sides */
+}
+
+
+/* --- inline ---
+   Takes only as much WIDTH as its content needs.
+   Does NOT start on a new line — sits next to other inline elements.
+   You CANNOT set width or height.
+   Vertical margin/padding is IGNORED (horizontal works).
+
+   Default inline elements: span, a, strong, em, img*
+*/
+
+.inline-example {
+  display: inline;
+  width: 300px;       /* IGNORED */
+  height: 100px;      /* IGNORED */
+  margin-top: 20px;   /* IGNORED */
+  margin-left: 20px;  /* works */
+  padding: 10px;      /* applies visually but doesn't push other elements vertically */
+}
+
+
+/* --- inline-block ---
+   BEST OF BOTH:
+   - Sits inline (next to other elements, no new line)
+   - But you CAN set width, height, margin, padding
+
+   Use case: buttons side by side, nav items with fixed sizes
+*/
+
+.inline-block-example {
+  display: inline-block;
+  width: 150px;       /* works */
+  height: 50px;       /* works */
+  margin: 10px;       /* works on all sides */
+}
+
+
+/* --- none ---
+   Element is COMPLETELY REMOVED from the page.
+   Takes no space. Not visible. Not accessible.
+*/
+
+.hidden {
+  display: none;
+  /* Element doesn't exist in layout at all */
+}
+
+/* vs visibility: hidden — element is INVISIBLE but still takes space */
+.invisible {
+  visibility: hidden;
+  /* Takes space, just not visible */
+}
+
+
+/* --- VISUAL COMPARISON ---
+
+   BLOCK:
+   ┌──────────────────────────────┐
+   │  Takes full width            │
+   └──────────────────────────────┘
+   ┌──────────────────────────────┐
+   │  Next block = new line       │
+   └──────────────────────────────┘
+
+   INLINE:
+   [span1][span2][span3] ← all on same line
+
+   INLINE-BLOCK:
+   ┌────────┐ ┌────────┐ ┌────────┐
+   │ box 1  │ │ box 2  │ │ box 3  │  ← same line, but with width/height
+   └────────┘ └────────┘ └────────┘
+
+*/

@@ -1,0 +1,108 @@
+/* ============================================================
+   PRICING CARD PROJECT — Line-by-Line Explanation
+   (Companion to 11-project-pricing-card.html)
+   ============================================================ */
+
+
+/* ── RESET ──────────────────────────────────────────────────
+   *, *::before, *::after { box-sizing: border-box; }
+
+   WHY: Without this, width: 100% + padding = overflow.
+   border-box makes width INCLUDE padding and border.
+   Applied to * so EVERY element uses it.
+*/
+
+
+/* ── html { font-size: 62.5%; } ────────────────────────────
+   Browser default = 16px.
+   62.5% of 16px = 10px.
+   Now 1rem = 10px → easy math.
+
+   1.6rem = 16px
+   2.4rem = 24px
+   3.2rem = 32px
+
+   Still accessible: if user sets default to 20px,
+   62.5% of 20px = 12.5px. Everything scales UP.
+*/
+
+
+/* ── body { min-height: 100dvh; } ──────────────────────────
+   WHY dvh and not vh?
+   On mobile, 100vh = taller than visible area because
+   the browser URL bar is counted. dvh adjusts dynamically.
+
+   WHY min-height not height?
+   If content is taller than the screen, height: 100dvh
+   would cut it off. min-height allows it to grow.
+*/
+
+
+/* ── body { display: flex; justify-content: center; align-items: center; }
+   Centers the card both horizontally and vertically.
+   justify-content: center → horizontal (main axis)
+   align-items: center → vertical (cross axis)
+*/
+
+
+/* ── .pricing-card { width: 100%; max-width: 38rem; } ──────
+   width: 100% → fills available space on small screens.
+   max-width: 38rem → caps at 380px on large screens.
+   This combo = responsive width with a maximum.
+*/
+
+
+/* ── font-size: clamp(3.6rem, 8vw, 5.6rem) ────────────────
+   clamp(minimum, preferred, maximum)
+
+   On a 375px phone: 8vw = 30px → uses 3.6rem (36px, the minimum)
+   On a 700px tablet: 8vw = 56px → uses 5.6rem (56px, the maximum)
+   On a 500px screen: 8vw = 40px → uses 40px (within bounds)
+
+   Result: font scales fluidly between 36px and 56px.
+*/
+
+
+/* ── .pricing-card__price span { font-size: 0.4em; } ───────
+   em here is correct, not rem.
+   0.4em = 40% of the PARENT's computed font-size.
+   Parent price is ~56px → span = ~22px.
+   If price scales down to 36px → span = ~14px.
+   The "/month" text always stays proportional to the price.
+*/
+
+
+/* ── max-width: 30ch ───────────────────────────────────────
+   ch = width of the "0" character.
+   30ch = roughly 30 characters wide.
+   Keeps the feature list from stretching too wide.
+   Great for controlling text block width.
+*/
+
+
+/* ── padding: 0.75em 2em (on button) ──────────────────────
+   em on the button = relative to BUTTON's font-size (1.6rem = 16px).
+   0.75em = 12px top/bottom.
+   2em = 32px left/right.
+
+   WHY em and not rem?
+   If you later make a .button-large with font-size: 2.4rem,
+   the padding auto-scales to 18px / 48px. No extra CSS needed.
+*/
+
+
+/* ── letter-spacing: 0.15em ────────────────────────────────
+   0.15em = 15% of the font-size.
+   If font-size is 16px → spacing = 2.4px between letters.
+   Scales proportionally if font changes.
+   Common for uppercase labels.
+*/
+
+
+/* ── transition: background 0.3s ease ─────────────────────
+   Only transitions background property (not all).
+   0.3s = 300 milliseconds duration.
+   ease = starts slow, speeds up, slows down.
+   Applied on the base state (not :hover) so it
+   transitions BOTH ways (hover in AND hover out).
+*/

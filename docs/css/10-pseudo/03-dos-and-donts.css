@@ -1,0 +1,100 @@
+/* ============================================================
+   PSEUDO-CLASSES & PSEUDO-ELEMENTS — DO's and DON'Ts
+   ============================================================ */
+
+
+/* ❌ DON'T: Use :hover for critical interactions on mobile */
+.dropdown:hover .menu { display: block; }
+/* Touch devices don't have hover. Menu won't open. */
+
+/* ✅ DO: Use :focus-within or JS for dropdown menus */
+.dropdown:focus-within .menu { display: block; }
+/* Works with keyboard AND tap */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Remove focus outlines without replacement */
+button:focus { outline: none; }
+/* Keyboard users can't see what's focused. Accessibility violation. */
+
+/* ✅ DO: Replace default outline with a styled one */
+button:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+/* :focus-visible = only shows for KEYBOARD navigation, not mouse clicks */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Put important content in ::before/::after */
+.price::before { content: '$'; }
+.price::after  { content: ' USD'; }
+/* Screen readers may skip pseudo-element content.
+   The price would read as just "29" instead of "$29 USD". */
+
+/* ✅ DO: Put important text in HTML, use pseudo for decoration only */
+/* HTML: <span class="price">$29 USD</span> */
+.price::after {
+  content: '';  /* empty = decorative */
+  display: block;
+  width: 50px;
+  height: 2px;
+  background: blue;
+}
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use ::before/::after on replaced elements */
+img::before { content: 'Image: '; }
+input::after { content: '*'; }
+/* DOESN'T WORK. img, input, video, textarea can't have pseudo-elements.
+   They are "replaced" elements — CSS can't insert content into them. */
+
+/* ✅ DO: Wrap in a span/div and use pseudo on the wrapper */
+.input-wrapper::after { content: '*'; color: red; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Forget content property on pseudo-elements */
+.box::before {
+  display: block;
+  width: 50px;
+  height: 50px;
+  background: red;
+  /* Missing content: '' → element doesn't render at all! */
+}
+
+/* ✅ DO: Always include content (even empty string) */
+.box::before {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 50px;
+  background: red;
+}
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Confuse :nth-child and :nth-of-type */
+/* <div>
+     <h2>Title</h2>
+     <p>First para</p>     ← p:nth-child(2) ✓ (2nd child overall)
+     <p>Second para</p>    ← p:nth-of-type(2) ✓ (2nd <p>)
+   </div>
+
+   p:nth-child(1) → NOTHING (1st child is <h2>, not <p>)
+   p:nth-of-type(1) → "First para" (1st <p> regardless of other types)
+*/
+
+/* ✅ DO: Use :nth-of-type when mixing element types */
+p:nth-of-type(odd) { background: #f5f5f5; }

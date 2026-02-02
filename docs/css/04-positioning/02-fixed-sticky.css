@@ -1,0 +1,90 @@
+/* ============================================================
+   POSITION: fixed & sticky
+   ============================================================ */
+
+
+/* --- fixed ---
+   Removed from normal flow.
+   Positioned relative to the VIEWPORT (browser window).
+   Does NOT move when you scroll.
+   Always visible on screen.
+*/
+
+.navbar-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;              /* full width */
+  z-index: 100;          /* above other content */
+  background: white;
+}
+
+/* Back-to-top button */
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+/* GOTCHA: fixed element is removed from flow.
+   Content behind it gets hidden. Add padding to body: */
+body {
+  padding-top: 60px;    /* height of the fixed navbar */
+}
+
+
+/* --- sticky ---
+   HYBRID of relative and fixed.
+   Acts relative until a scroll threshold, then becomes fixed.
+   Stays within its PARENT container.
+*/
+
+.sticky-header {
+  position: sticky;
+  top: 0;                /* "stick" when top reaches 0 (viewport edge) */
+  background: white;
+  z-index: 10;
+}
+
+/* REAL-WORLD: Table headers that stick while scrolling */
+thead th {
+  position: sticky;
+  top: 0;
+  background: white;
+}
+
+/* REAL-WORLD: Sidebar that sticks while scrolling main content */
+.sidebar {
+  position: sticky;
+  top: 20px;             /* stick 20px from top of viewport */
+}
+
+
+/* STICKY REQUIREMENTS (common gotcha):
+   1. MUST set top, right, bottom, or left
+   2. Parent must NOT have overflow: hidden/auto/scroll
+   3. Parent must be tall enough for scrolling to happen
+   4. sticky element stays within its parent's boundaries
+*/
+
+
+/* VISUAL — Sticky behavior:
+
+   BEFORE SCROLLING:
+   ┌──────────────────────┐ ← viewport top
+   │ Other content        │
+   │ ┌──────────────────┐ │
+   │ │ Sticky Header    │ │ ← acts like relative
+   │ └──────────────────┘ │
+   │ Content below...     │
+   └──────────────────────┘
+
+   AFTER SCROLLING DOWN:
+   ┌──────────────────────┐ ← viewport top
+   │ ┌──────────────────┐ │
+   │ │ Sticky Header    │ │ ← now stuck to top!
+   │ └──────────────────┘ │
+   │ Content below...     │
+   │ Content below...     │
+   └──────────────────────┘
+*/

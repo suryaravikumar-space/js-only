@@ -1,0 +1,87 @@
+/* ============================================================
+   SELECTORS & SPECIFICITY — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: What is CSS specificity? How is it calculated?
+   ──────────────────────────────────────────────────────────────
+   Specificity determines which CSS rule wins when multiple
+   rules target the same element.
+
+   Score: (inline, IDs, classes/attributes/pseudo-classes, elements/pseudo-elements)
+   Higher score wins. If tied, last rule in code wins.
+*/
+
+
+/* Q2: What is the difference between > and (space) selector?
+   ──────────────────────────────────────────────────────────────
+   div p   → ALL <p> descendants at ANY depth inside div
+   div > p → Only DIRECT <p> children of div (not grandchildren)
+*/
+
+
+/* Q3: What is the difference between + and ~ selector?
+   ──────────────────────────────────────────────────────────────
+   h2 + p  → Only the FIRST <p> immediately after h2 (adjacent)
+   h2 ~ p  → ALL <p> siblings after h2 (general sibling)
+*/
+
+
+/* Q4: Can 10 classes override 1 ID?
+   ──────────────────────────────────────────────────────────────
+   NO. 1 ID (0,1,0,0) always beats any number of classes (0,0,X,0).
+   Specificity categories don't overflow into each other.
+*/
+
+
+/* Q5: What does !important do? Should you use it?
+   ──────────────────────────────────────────────────────────────
+   !important overrides ALL specificity rules.
+   AVOID IT. It makes debugging very hard.
+   Only acceptable uses:
+   - Overriding third-party library styles you can't change
+   - Accessibility user stylesheets
+*/
+.bad-practice {
+  color: red !important;  /* Don't do this */
+}
+
+
+/* Q6: What is the universal selector * and its specificity?
+   ──────────────────────────────────────────────────────────────
+   * selects every element. Specificity = 0,0,0,0.
+   It loses to any other selector.
+*/
+
+
+/* Q7: What is the :not() selector? Does it affect specificity?
+   ──────────────────────────────────────────────────────────────
+   :not() excludes elements from selection.
+   :not() itself adds 0 specificity.
+   But the selector INSIDE it counts normally.
+*/
+p:not(.special) { color: gray; }
+/* Specificity: 0,0,1,1 — the .special class counts */
+
+
+/* Q8: What is the difference between :nth-child and :nth-of-type?
+   ──────────────────────────────────────────────────────────────
+   :nth-child(2)    → 2nd child regardless of type
+   :nth-of-type(2)  → 2nd child of THAT specific element type
+
+   <div>
+     <h2>Title</h2>
+     <p>First</p>    ← p:nth-child(2) selects this (2nd child overall)
+     <p>Second</p>   ← p:nth-of-type(2) selects this (2nd <p>)
+   </div>
+*/
+
+
+/* Q9: How do you select the first and last child?
+   ──────────────────────────────────────────────────────────────
+*/
+li:first-child { /* first <li> in its parent */ }
+li:last-child  { /* last <li> in its parent */ }
+li:nth-child(odd)  { /* 1st, 3rd, 5th... (zebra striping) */ }
+li:nth-child(even) { /* 2nd, 4th, 6th... */ }
+li:nth-child(3n)   { /* every 3rd: 3, 6, 9... */ }

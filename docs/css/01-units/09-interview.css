@@ -1,0 +1,70 @@
+/* ============================================================
+   CSS UNITS — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: What is the difference between em and rem?
+   ──────────────────────────────────────────────────────────────
+   em  → relative to PARENT's font-size. Compounds through nesting.
+   rem → relative to ROOT (<html>) font-size. Always predictable.
+
+   Use rem for font-size (consistency).
+   Use em for component-internal spacing (scales with component).
+*/
+
+
+/* Q2: What is 1px in CSS? Is it the same as a physical pixel?
+   ──────────────────────────────────────────────────────────────
+   NO. 1 CSS px is a "reference pixel" = 1/96th of an inch.
+   On Retina (DPR=2): 1 CSS px = 4 physical pixels.
+   On DPR=3: 1 CSS px = 9 physical pixels.
+*/
+
+
+/* Q3: Why should you avoid px for font-size?
+   ──────────────────────────────────────────────────────────────
+   If a user changes their browser's default font size
+   (accessibility), px-based fonts will NOT scale.
+   rem-based fonts WILL scale. Always use rem for fonts.
+*/
+
+
+/* Q4: What does viewport mean? What are vw and vh?
+   ──────────────────────────────────────────────────────────────
+   Viewport = visible area of the browser window.
+   1vw = 1% of viewport width.
+   1vh = 1% of viewport height.
+   100vh on mobile can be buggy — use 100dvh instead.
+*/
+
+
+/* Q5: What is the 62.5% font-size trick?
+   ──────────────────────────────────────────────────────────────
+   html { font-size: 62.5%; }  → makes 1rem = 10px
+   Easier math: 1.6rem = 16px, 2.4rem = 24px.
+   Still accessible because it's percentage-based.
+*/
+
+
+/* Q6: padding: 10% — 10% of what?
+   ──────────────────────────────────────────────────────────────
+   10% of the PARENT's WIDTH. Even for top/bottom padding.
+   This is a common interview trick question.
+   Margin % works the same way.
+*/
+
+
+/* Q7: What is the difference between vmin and vmax?
+   ──────────────────────────────────────────────────────────────
+   vmin = 1% of the SMALLER dimension (width or height)
+   vmax = 1% of the LARGER dimension
+   Useful for elements that should work in any orientation.
+*/
+
+
+/* Q8: How do you make typography responsive?
+   ──────────────────────────────────────────────────────────────
+   Use clamp():
+   font-size: clamp(1rem, 2.5vw, 3rem);
+   → min: 1rem, scales with viewport, max: 3rem
+*/

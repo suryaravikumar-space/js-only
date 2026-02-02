@@ -1,0 +1,35 @@
+/* ============================================================
+   % (Percentage) — Relative to PARENT element
+   ============================================================
+
+   What "parent" means depends on the property:
+
+   width: 50%     → 50% of parent's WIDTH
+   height: 50%    → 50% of parent's HEIGHT
+   padding: 10%   → 10% of parent's WIDTH (even vertical!)
+   margin: 10%    → 10% of parent's WIDTH (same quirk)
+   font-size: 120% → 120% of parent's font-size
+
+   ============================================================ */
+
+.parent {
+  width: 800px;
+  height: 600px;
+}
+
+.child {
+  width: 50%;      /* 400px */
+  height: 50%;     /* 300px */
+  padding: 5%;     /* 40px on ALL sides (5% of 800px width) */
+}
+
+
+/* GOTCHA: height: 100% needs parent to have explicit height */
+
+.broken {
+  height: 100%;    /* Won't work if parent has no defined height */
+}
+
+.fixed {
+  height: 100vh;   /* Use vh instead — always works */
+}

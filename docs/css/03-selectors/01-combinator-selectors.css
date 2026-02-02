@@ -1,0 +1,66 @@
+/* ============================================================
+   COMBINATOR SELECTORS — Relationships between elements
+   ============================================================
+
+   HTML structure for examples:
+   <div class="container">
+     <p>Direct child</p>
+     <section>
+       <p>Nested paragraph</p>
+     </section>
+     <p>Another direct child</p>
+     <p>Sibling of above</p>
+   </div>
+
+   ============================================================ */
+
+
+/* --- Descendant Selector (space) ---
+   Selects ALL matching elements ANYWHERE inside the parent.
+   Can be child, grandchild, great-grandchild, etc. */
+
+.container p {
+  color: blue;
+  /* Selects ALL <p> inside .container, at ANY depth */
+}
+
+
+/* --- Child Selector > ---
+   Selects ONLY direct children. Not grandchildren. */
+
+.container > p {
+  color: red;
+  /* Only <p> that are DIRECT children of .container
+     The nested <p> inside <section> is NOT selected */
+}
+
+
+/* --- Adjacent Sibling Selector + ---
+   Selects the element IMMEDIATELY after (same parent, next sibling) */
+
+h2 + p {
+  font-size: 1.2rem;
+  /* Only the FIRST <p> directly after an <h2> */
+}
+
+
+/* --- General Sibling Selector ~ ---
+   Selects ALL siblings that come AFTER (same parent) */
+
+h2 ~ p {
+  color: gray;
+  /* ALL <p> elements that are siblings AFTER an <h2> */
+}
+
+
+/* --- VISUAL ---
+
+   <div>
+     <h2>Title</h2>
+     <p>First</p>     ← h2 + p selects THIS (adjacent)
+     <p>Second</p>    ← h2 ~ p selects THIS too (general sibling)
+     <span>Skip</span>
+     <p>Third</p>     ← h2 ~ p selects THIS too
+   </div>
+
+*/

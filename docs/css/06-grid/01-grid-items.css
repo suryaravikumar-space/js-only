@@ -1,0 +1,87 @@
+/* ============================================================
+   CSS GRID — Item Properties (Children) & Placement
+   ============================================================ */
+
+
+/* --- Placing items by line numbers ---
+   Grid lines are numbered starting at 1.
+
+   For a 3-column grid:
+   Column lines: 1 | 2 | 3 | 4
+   Row lines:    1 — 2 — 3 — 4
+*/
+
+.item-span {
+  grid-column: 1 / 3;    /* starts at line 1, ends at line 3 (spans 2 cols) */
+  grid-row: 1 / 2;       /* row 1 only */
+}
+
+/* Shorthand with span keyword */
+.item-span-keyword {
+  grid-column: span 2;   /* spans 2 columns from wherever placed */
+  grid-row: span 3;      /* spans 3 rows */
+}
+
+/* Full-width item */
+.full-width {
+  grid-column: 1 / -1;   /* -1 means last line = full width */
+}
+
+
+/* --- grid-template-areas ---
+   Name areas, then assign items to them.
+   Most readable way to define layouts.
+*/
+
+.page-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 60px 1fr 50px;
+  grid-template-areas:
+    "header  header"
+    "sidebar main"
+    "footer  footer";
+  min-height: 100vh;
+}
+
+.header  { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main    { grid-area: main; }
+.footer  { grid-area: footer; }
+
+/*
+   VISUAL:
+   ┌────────────────────────────────┐
+   │           header               │  60px
+   ├──────────┬─────────────────────┤
+   │          │                     │
+   │ sidebar  │       main          │  1fr
+   │  250px   │                     │
+   ├──────────┴─────────────────────┤
+   │           footer               │  50px
+   └────────────────────────────────┘
+*/
+
+
+/* --- Alignment within grid cells --- */
+
+/* Align ALL items */
+.grid-align {
+  display: grid;
+  justify-items: center;   /* horizontal alignment within cells */
+  align-items: center;     /* vertical alignment within cells */
+  place-items: center;     /* shorthand for both */
+}
+
+/* Align ONE specific item */
+.special-item {
+  justify-self: end;       /* push this item to right of its cell */
+  align-self: start;       /* push to top of its cell */
+}
+
+/* Align the entire GRID within its container */
+.grid-content {
+  display: grid;
+  justify-content: center;  /* center the grid horizontally */
+  align-content: center;    /* center the grid vertically */
+}

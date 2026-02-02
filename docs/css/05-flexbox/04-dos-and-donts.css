@@ -1,0 +1,79 @@
+/* ============================================================
+   FLEXBOX — DO's and DON'Ts
+   ============================================================ */
+
+
+/* ❌ DON'T: Use float for layout when flexbox exists */
+.item { float: left; width: 33.33%; }
+/* Requires clearfix, breaks easily, no vertical alignment */
+
+/* ✅ DO: Use flexbox */
+.container { display: flex; }
+.item { flex: 1; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use margin hacks for spacing between items */
+.item { margin-right: 16px; }
+.item:last-child { margin-right: 0; }  /* ugh, remove from last */
+
+/* ✅ DO: Use gap */
+.container { display: flex; gap: 16px; }
+/* Clean, no edge margins, no :last-child hack */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Forget min-width: 0 on flex items */
+.long-text-item {
+  flex: 1;
+  /* If text is very long, this item WON'T shrink below content size.
+     It can overflow the container. */
+}
+
+/* ✅ DO: Add min-width: 0 to allow proper shrinking */
+.long-text-item {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use flexbox for 2D grid layouts */
+.grid { display: flex; flex-wrap: wrap; }
+.grid-item { width: 33.33%; }
+/* Items don't align across rows if heights differ */
+
+/* ✅ DO: Use CSS Grid for 2D */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use justify-content for one-off alignment */
+.nav { display: flex; justify-content: space-between; }
+/* Works for 2 items, but gets weird with 3+ */
+
+/* ✅ DO: Use margin-left: auto to push one item */
+.nav { display: flex; }
+.nav__login { margin-left: auto; }  /* pushes to far right */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Set flex-basis and width at the same time */
+.item { width: 200px; flex-basis: 300px; }
+/* Confusing — flex-basis overrides width in flex context */
+
+/* ✅ DO: Use flex shorthand only */
+.item { flex: 0 0 300px; }  /* no grow, no shrink, 300px base */

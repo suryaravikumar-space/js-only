@@ -1,0 +1,56 @@
+/* ============================================================
+   THE BOX MODEL
+   ============================================================
+
+   Every HTML element is a BOX with 4 layers:
+
+   ┌─────────────────────────────────┐
+   │           MARGIN                │  Space outside border
+   │  ┌───────────────────────────┐  │
+   │  │        BORDER             │  │  Visible edge
+   │  │  ┌───────────────────┐    │  │
+   │  │  │    PADDING        │    │  │  Space inside border
+   │  │  │  ┌───────────┐    │    │  │
+   │  │  │  │  CONTENT  │    │    │  │  Your text/images
+   │  │  │  └───────────┘    │    │  │
+   │  │  └───────────────────┘    │  │
+   │  └───────────────────────────┘  │
+   └─────────────────────────────────┘
+
+   ============================================================ */
+
+
+/* DEFAULT: content-box
+   width = content only. Padding & border are ADDED on top.
+
+   width: 200px + padding: 20px + border: 2px
+   = 200 + 20 + 20 + 2 + 2 = 244px actual width!
+*/
+
+.box-default {
+  box-sizing: content-box;  /* default behavior */
+  width: 200px;
+  padding: 20px;
+  border: 2px solid black;
+  /* Actual width: 244px — confusing! */
+}
+
+
+/* FIX: border-box
+   width = content + padding + border COMBINED.
+   200px means 200px total. Always.
+*/
+
+.box-fixed {
+  box-sizing: border-box;
+  width: 200px;
+  padding: 20px;
+  border: 2px solid black;
+  /* Actual width: 200px — content shrinks to 156px */
+}
+
+
+/* ALWAYS add this reset to every project */
+*, *::before, *::after {
+  box-sizing: border-box;
+}

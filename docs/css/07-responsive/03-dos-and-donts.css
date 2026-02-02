@@ -1,0 +1,73 @@
+/* ============================================================
+   RESPONSIVE DESIGN — DO's and DON'Ts
+   ============================================================ */
+
+
+/* ❌ DON'T: Design desktop-first */
+.container { width: 1200px; }
+@media (max-width: 768px) { .container { width: 100%; } }
+/* Mobile loads all desktop CSS then overrides it — wasted bytes */
+
+/* ✅ DO: Design mobile-first */
+.container { width: 100%; }
+@media (min-width: 768px) { .container { max-width: 720px; } }
+/* Mobile loads only what it needs. Faster. */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use fixed widths */
+.card { width: 400px; }
+/* Overflows on any screen smaller than 400px */
+
+/* ✅ DO: Use fluid widths with max-width */
+.card { width: 100%; max-width: 400px; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Forget the viewport meta tag */
+/* Without <meta name="viewport" content="width=device-width, initial-scale=1">
+   mobile browsers render at ~980px width and zoom out */
+
+/* ✅ DO: Always include it in <head> */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use too many breakpoints */
+@media (max-width: 1200px) { }
+@media (max-width: 1024px) { }
+@media (max-width: 992px) { }
+@media (max-width: 768px) { }
+@media (max-width: 576px) { }
+@media (max-width: 480px) { }
+@media (max-width: 320px) { }
+/* 7 breakpoints = maintenance nightmare */
+
+/* ✅ DO: Use 2-3 breakpoints max */
+/* Mobile (base), Tablet (768px), Desktop (1024px) */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Hide content on mobile with display: none */
+.sidebar { display: none; }  /* on mobile */
+/* Users miss content. Still loads in HTML. Not accessible. */
+
+/* ✅ DO: Reorganize layout instead of hiding */
+/* Stack sidebar below main content on mobile, or use a hamburger menu */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use images without responsive sizing */
+img { width: 500px; }
+
+/* ✅ DO: Make images responsive */
+img { max-width: 100%; height: auto; }

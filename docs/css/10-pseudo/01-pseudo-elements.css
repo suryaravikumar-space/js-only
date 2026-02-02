@@ -1,0 +1,87 @@
+/* ============================================================
+   PSEUDO-ELEMENTS — Create virtual elements with CSS
+   ============================================================
+
+   Written with double colon  ::name
+   They INSERT new content that doesn't exist in HTML.
+
+   ============================================================ */
+
+
+/* --- ::before and ::after ---
+   Insert content BEFORE or AFTER the element's content.
+   REQUIRE the content property (even if empty).
+*/
+
+.quote::before {
+  content: '"';            /* adds opening quote */
+  font-size: 2rem;
+  color: gray;
+}
+
+.quote::after {
+  content: '"';            /* adds closing quote */
+}
+
+/* Decorative element (no visible text) */
+.heading::after {
+  content: '';             /* required, even if empty */
+  display: block;
+  width: 50px;
+  height: 3px;
+  background: blue;
+  margin-top: 0.5rem;
+}
+
+
+/* --- ::placeholder --- */
+input::placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+
+/* --- ::selection --- */
+::selection {
+  background: #007bff;
+  color: white;
+}
+
+
+/* --- ::first-letter and ::first-line --- */
+.article p:first-of-type::first-letter {
+  font-size: 3rem;
+  float: left;
+  line-height: 1;
+  margin-right: 0.5rem;
+  /* Drop cap effect like in magazines */
+}
+
+p::first-line {
+  font-weight: bold;
+}
+
+
+/* --- REAL-WORLD: Tooltip with ::after --- */
+.tooltip {
+  position: relative;
+}
+.tooltip::after {
+  content: attr(data-tip);  /* reads from HTML attribute! */
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.tooltip:hover::after {
+  opacity: 1;
+}
+/* HTML: <span class="tooltip" data-tip="Hello!">Hover me</span> */

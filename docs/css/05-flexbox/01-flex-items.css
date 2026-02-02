@@ -1,0 +1,66 @@
+/* ============================================================
+   FLEXBOX — Item Properties (Children)
+   ============================================================ */
+
+
+/* --- flex-grow ---
+   How much an item should GROW to fill remaining space.
+   Default: 0 (don't grow).
+
+   If container is 600px and items total 300px:
+   → 300px remaining space to distribute.
+*/
+
+.item-a { flex-grow: 1; }  /* gets 1 share of extra space */
+.item-b { flex-grow: 2; }  /* gets 2 shares of extra space */
+.item-c { flex-grow: 1; }  /* gets 1 share of extra space */
+/* Total shares = 4. 300px / 4 = 75px per share.
+   A gets 75px extra, B gets 150px, C gets 75px. */
+
+
+/* --- flex-shrink ---
+   How much an item should SHRINK when space is tight.
+   Default: 1 (all items shrink equally).
+   0 = never shrink.
+*/
+
+.no-shrink { flex-shrink: 0; }  /* stays its original size */
+.shrinks   { flex-shrink: 2; }  /* shrinks twice as much */
+
+
+/* --- flex-basis ---
+   The STARTING size of an item before grow/shrink.
+   Like width, but for the flex main axis.
+   Default: auto (uses width/content size).
+*/
+
+.item { flex-basis: 200px; }   /* start at 200px, then grow/shrink */
+.item { flex-basis: 30%; }     /* start at 30% of container */
+
+
+/* --- flex shorthand (RECOMMENDED) ---
+   flex: grow shrink basis
+*/
+
+.item { flex: 0 1 auto; }     /* default: don't grow, can shrink, auto size */
+.item { flex: 1; }            /* same as: flex: 1 1 0%  — grow equally */
+.item { flex: none; }         /* same as: flex: 0 0 auto — rigid size */
+.item { flex: 1 0 200px; }   /* grow from 200px base, never shrink */
+
+
+/* --- align-self ---
+   Override align-items for ONE specific item.
+*/
+
+.container { align-items: flex-start; }
+.special-item { align-self: center; }  /* only this one is centered */
+
+
+/* --- order ---
+   Controls visual order without changing HTML.
+   Default: 0. Lower values appear first.
+*/
+
+.first  { order: -1; }  /* appears first */
+.normal { order: 0; }   /* default position */
+.last   { order: 1; }   /* appears last */

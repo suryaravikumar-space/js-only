@@ -1,0 +1,66 @@
+/* ============================================================
+   POSITION: static & relative
+   ============================================================
+
+   position controls WHERE an element is placed.
+   Works with: top, right, bottom, left (offsets)
+
+   ============================================================ */
+
+
+/* --- static (DEFAULT) ---
+   Normal document flow.
+   top/right/bottom/left have NO effect.
+   z-index has NO effect.
+   Every element is static by default.
+*/
+
+.static-box {
+  position: static;    /* default — you never need to write this */
+  top: 50px;           /* IGNORED — static doesn't use offsets */
+}
+
+
+/* --- relative ---
+   Element stays in normal flow (takes its original space).
+   BUT you can OFFSET it from its ORIGINAL position.
+   Other elements don't move — they act like it's still there.
+
+   Think of it as: "nudge from where I was"
+*/
+
+.relative-box {
+  position: relative;
+  top: 20px;           /* moves DOWN 20px from original position */
+  left: 10px;          /* moves RIGHT 10px from original position */
+  /* Original space is STILL reserved in the layout */
+}
+
+/* VISUAL:
+
+   Normal flow:
+   ┌──────────┐
+   │ Box A    │
+   ├──────────┤
+   │ Box B    │  ← original position
+   ├──────────┤
+   │ Box C    │
+   └──────────┘
+
+   Box B with position: relative; top: 20px; left: 10px;
+   ┌──────────┐
+   │ Box A    │
+   ├──────────┤
+   │ (gap)    │  ← original space still reserved
+   ├──────────┤
+   │ Box C    │
+   └──────────┘
+        ┌──────────┐
+        │ Box B    │  ← visually shifted, but layout unchanged
+        └──────────┘
+*/
+
+/* MAIN USE of relative: as a CONTAINER for absolute children */
+.parent {
+  position: relative;  /* This makes it the reference point */
+}

@@ -1,0 +1,74 @@
+/* ============================================================
+   ABSOLUTE UNITS — Fixed size, never change
+   ============================================================
+
+   Unit | Name        | Equals
+   -----|-------------|------------------
+   px   | Pixel       | 1/96th of 1 inch
+   in   | Inch        | 96px = 2.54cm
+   cm   | Centimeter  | 37.8px
+   mm   | Millimeter  | 3.78px
+   pt   | Point       | 1.33px (1/72 inch)
+   pc   | Pica        | 16px (12 points)
+
+   ============================================================ */
+
+
+/* --- px (Pixel) ---
+   Most used absolute unit. Predictable.
+   USE FOR: borders, shadows, small spacing
+   AVOID FOR: font-size (use rem), layout width (use %) */
+
+.box {
+  width: 200px;
+  height: 100px;
+  border: 2px solid black;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+
+/* --- in (Inch) ---
+   1in = 96px = 2.54cm
+   ONLY for print. 1 CSS inch ≠ 1 physical inch on screen. */
+
+.box-inch {
+  width: 3in;    /* = 288px */
+  margin: 0.5in; /* = 48px */
+}
+
+
+/* --- cm (Centimeter) ---
+   1cm = 37.8px
+   ONLY for print. */
+
+.box-cm {
+  width: 10cm;   /* = 378px */
+  padding: 1cm;  /* = 37.8px */
+}
+
+
+/* --- mm (Millimeter) ---
+   1mm = 3.78px. Even more granular. Print only. */
+
+.box-mm {
+  border-width: 2mm; /* = 7.56px */
+}
+
+
+/* --- pt (Point) ---
+   From traditional printing. "12 point font" = 12pt.
+   1pt = 1.33px. Print stylesheets only. */
+
+/* --- pc (Pica) ---
+   1pc = 12pt = 16px. Almost never used. */
+
+
+/* PRINT EXAMPLE — where in/cm/pt actually matter */
+@media print {
+  .page {
+    width: 6.5in;
+    margin: 1in;
+    font-size: 12pt;
+  }
+}

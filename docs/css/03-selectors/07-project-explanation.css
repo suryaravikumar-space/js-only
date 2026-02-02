@@ -1,0 +1,87 @@
+/* ============================================================
+   STYLED TABLE PROJECT — Line-by-Line Explanation
+   (Companion to 06-project-styled-table.html)
+   ============================================================ */
+
+
+/* ── table { border-collapse: collapse; } ──────────────────
+   Without this, table cells have double borders (gap between cells).
+   collapse merges adjacent cell borders into single borders.
+*/
+
+
+/* ── table { border-radius: 8px; overflow: hidden; } ──────
+   border-radius rounds the table corners.
+   overflow: hidden clips the sharp corners of child cells
+   so they don't poke out of the rounded parent.
+*/
+
+
+/* ── table th { text-transform: uppercase; letter-spacing: 0.05em; }
+   text-transform: uppercase → "Name" becomes "NAME".
+   letter-spacing: 0.05em → adds small space between letters.
+   Common pattern for table/section headers.
+*/
+
+
+/* ── tbody tr:nth-child(odd) { background: #fafafa; }
+   :nth-child(odd) selects 1st, 3rd, 5th, 7th rows...
+   :nth-child(even) selects 2nd, 4th, 6th, 8th rows...
+   Together they create zebra stripes for readability.
+
+   HOW nth-child works:
+   (odd)  = (2n+1) → 1, 3, 5, 7...
+   (even) = (2n)   → 2, 4, 6, 8...
+   (3n)   → every 3rd: 3, 6, 9...
+   (3n+1) → 1, 4, 7, 10... (offset by 1)
+*/
+
+
+/* ── tbody tr:hover { background: #e8f4fd; } ──────────────
+   :hover triggers when mouse is over the element.
+   Applied to <tr> so the ENTIRE ROW highlights.
+   Great for usability — helps user track which row they're reading.
+*/
+
+
+/* ── tbody tr:last-child td { border-bottom: none; } ──────
+   :last-child selects only the LAST <tr> in tbody.
+   Then we select td inside it and remove the bottom border.
+   Without this, the last row's border would double up with
+   the table's own bottom edge.
+*/
+
+
+/* ── td:first-child { font-weight: 600; } ─────────────────
+   :first-child on <td> = the FIRST column in every row.
+   Makes the "Name" column bold.
+   This works because :first-child selects the first <td>
+   among its siblings (within each <tr>).
+*/
+
+
+/* ── td[data-status="active"] { color: #28a745; } ─────────
+   ATTRIBUTE SELECTOR: [data-status="active"]
+   Targets <td> elements that have data-status="active" in HTML.
+
+   HTML: <td data-status="active">Active</td>
+
+   This is powerful — no extra classes needed.
+   The HTML data attribute drives the styling.
+   Each status gets its own color automatically.
+*/
+
+
+/* ── tbody tr:nth-child(3n) { border-left: 3px solid #007bff; }
+   (3n) = every 3rd row: 3, 6, 9, 12...
+   Adds a blue left accent as a visual rhythm marker.
+   Shows that nth-child can be used for patterns beyond zebra stripes.
+*/
+
+
+/* ── table + .caption { ... } ──────────────────────────────
+   ADJACENT SIBLING SELECTOR (+)
+   Selects .caption ONLY if it comes IMMEDIATELY after a <table>.
+   If there's any other element between them, this won't match.
+   Useful for styling content based on its context/neighbor.
+*/

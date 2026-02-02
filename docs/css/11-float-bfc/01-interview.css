@@ -1,0 +1,63 @@
+/* ============================================================
+   FLOAT & BFC — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: What is a BFC (Block Formatting Context)?
+   ──────────────────────────────────────────────────────────────
+   A BFC is an independent layout box where:
+   - Floats are contained inside
+   - Margins don't collapse across the boundary
+   - Content doesn't flow around outside floats
+
+   Created by: overflow:hidden, display:flow-root, flex, grid,
+   position:absolute/fixed, float.
+*/
+
+
+/* Q2: How do you clear floats?
+   ──────────────────────────────────────────────────────────────
+   Modern: display: flow-root on the parent.
+   Classic: clearfix hack (::after with clear: both).
+   Quick: overflow: auto/hidden on parent (can clip content).
+*/
+
+
+/* Q3: Why does a parent collapse when children are floated?
+   ──────────────────────────────────────────────────────────────
+   Floated elements are removed from normal flow.
+   The parent doesn't "see" them, so it calculates
+   its height as 0 (or just non-floated content height).
+*/
+
+
+/* Q4: What is margin collapse? When does it happen?
+   ──────────────────────────────────────────────────────────────
+   Adjacent vertical margins merge into one (the larger wins).
+
+   Happens:
+   - Between adjacent siblings
+   - Between parent and first/last child (if no border/padding)
+   - On empty blocks
+
+   Does NOT happen:
+   - Horizontal margins
+   - Inside flex/grid containers
+   - When a BFC boundary exists
+*/
+
+
+/* Q5: Should you use float for layout today?
+   ──────────────────────────────────────────────────────────────
+   NO. Use Flexbox or Grid.
+   Float is only for text wrapping around images.
+   But understand it for legacy code and interviews.
+*/
+
+
+/* Q6: What is display: flow-root?
+   ──────────────────────────────────────────────────────────────
+   Creates a BFC without side effects.
+   Best modern replacement for overflow:hidden or clearfix.
+   Supported in all modern browsers.
+*/

@@ -1,0 +1,311 @@
+<!-- ============================================================
+     MINI PROJECT: Form with CSS-Only Validation Styling
+     SKILLS: pseudo-classes (:valid, :invalid, :focus, :placeholder-shown,
+             :required, :not, :focus-within, :has)
+             pseudo-elements (::before, ::after, ::placeholder)
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Validation — Pseudo Project</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+
+    /* ===== FORM CONTAINER =====
+
+       :focus-within pseudo-class:
+       - Triggers when ANY child inside .form has focus.
+       - So when user clicks into any input, the entire
+         form gets a blue border.
+       - Great for visual "I'm interacting with this form" feedback.
+       - Works with keyboard tab too.
+    */
+    .form {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      border: 2px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+
+    .form:focus-within {
+      border-color: #007bff;
+      /*
+        :focus-within → fires when ANY descendant has focus.
+        Unlike :focus which only fires on the element itself.
+        The form gains a blue border when ANY input is focused.
+      */
+    }
+
+
+    .form__title {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .form__subtitle {
+      color: #888;
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+
+    /* ===== FORM GROUP =====
+
+       position: relative → reference for the ::after checkmark
+       that will be positioned absolutely inside this.
+    */
+    .form-group {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+      color: #555;
+    }
+
+
+    /* ===== REQUIRED LABEL ASTERISK =====
+
+       label::after with content: ' *'
+       BUT only for labels inside form-groups that contain
+       a required input.
+
+       .form-group:has(input:required) label::after
+       - :has() = parent selector. Checks if form-group
+         CONTAINS an input with the required attribute.
+       - If yes → add red asterisk after the label text.
+       - This is pure CSS — no classes or JS needed!
+    */
+    .form-group:has(input:required) label::after {
+      content: ' *';
+      color: #dc3545;
+      /*
+        content: ' *' → inserts a space + asterisk.
+        ::after creates a pseudo-element at the END of the label.
+        Screen readers may or may not read this.
+        For accessibility, also add aria-required="true" to input.
+      */
+    }
+
+
+    /* ===== INPUT BASE STYLES ===== */
+    .form-group input {
+      width: 100%;
+      padding: 0.7rem 0.75rem;
+      padding-right: 2.5rem;
+      /*
+        padding-right: 2.5rem → extra space on the right
+        for the checkmark/X icon that appears via ::after.
+        Without this, the icon would overlap the typed text.
+      */
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+
+    /* ===== ::placeholder =====
+
+       Styles the placeholder text (the gray hint text).
+       Only visible when input is empty.
+    */
+    .form-group input::placeholder {
+      color: #bbb;
+      font-style: italic;
+    }
+
+
+    /* ===== :focus =====
+
+       When the input is clicked or tabbed into:
+       - Blue border replaces the gray one.
+       - box-shadow: adds a subtle blue glow.
+       - outline: none (already set above) removes browser default.
+       - We ADD our own focus style with border + shadow.
+         NEVER remove focus without adding a replacement!
+    */
+    .form-group input:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+    }
+
+
+    /* ===== :valid and :invalid =====
+
+       These trigger based on HTML5 validation:
+       - type="email" → checks for @ symbol
+       - required → checks if not empty
+       - minlength → checks minimum characters
+
+       PROBLEM: :invalid triggers immediately (even before user types).
+       SOLUTION: Combine with :not(:placeholder-shown).
+
+       :placeholder-shown → true when placeholder IS visible (input is empty).
+       :not(:placeholder-shown) → true when placeholder is NOT visible
+                                   (user has typed something).
+
+       So: input:not(:placeholder-shown):valid
+       = "input where user HAS typed AND the value IS valid"
+
+       This prevents showing red borders on empty (untouched) fields.
+    */
+    .form-group input:not(:placeholder-shown):valid {
+      border-color: #28a745;
+      /*
+        Green border when:
+        1. User has typed something (:not(:placeholder-shown))
+        2. AND the input passes validation (:valid)
+      */
+    }
+
+    .form-group input:not(:placeholder-shown):invalid {
+      border-color: #dc3545;
+      /*
+        Red border when:
+        1. User has typed something
+        2. AND the input FAILS validation (:invalid)
+        e.g., email without @, password too short
+      */
+    }
+
+
+    /* ===== VALIDATION ICON (::after) =====
+
+       .form-group::after creates a pseudo-element
+       that shows a checkmark or X icon.
+
+       position: absolute → positioned relative to .form-group.
+       right: 12px; bottom: 12px → bottom-right of the input area.
+       pointer-events: none → clicks pass through the icon to the input.
+    */
+
+    /* ✓ Green checkmark for valid input */
+    .form-group:has(input:not(:placeholder-shown):valid)::after {
+      content: '✓';
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      color: #28a745;
+      font-weight: bold;
+      font-size: 1.1rem;
+      pointer-events: none;
+      /*
+        :has() checks if this form-group contains a valid,
+        non-empty input. If yes → show green checkmark.
+      */
+    }
+
+    /* ✗ Red X for invalid input */
+    .form-group:has(input:not(:placeholder-shown):invalid)::after {
+      content: '✗';
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      color: #dc3545;
+      font-weight: bold;
+      font-size: 1.1rem;
+      pointer-events: none;
+    }
+
+
+    /* ===== SUBMIT BUTTON =====
+
+       :disabled pseudo-class → styles the button when
+       it has the disabled HTML attribute.
+       (In real app, JS would enable it when form is valid)
+    */
+    .form__submit {
+      width: 100%;
+      padding: 0.75rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-top: 0.5rem;
+    }
+
+    .form__submit:hover { background: #0056b3; }
+
+    .form__submit:active {
+      transform: scale(0.98);
+      /*
+        :active = moment the button is pressed down.
+        scale(0.98) = shrinks 2% = "click" feedback.
+      */
+    }
+
+
+    /* ===== HELPER TEXT =====
+
+       Small text below inputs for hints.
+       Uses :first-of-type to style only in specific contexts.
+    */
+    .helper {
+      font-size: 0.75rem;
+      color: #999;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+
+  <form class="form" onsubmit="event.preventDefault(); alert('Form submitted!')">
+    <h2 class="form__title">Create Account</h2>
+    <p class="form__subtitle">CSS-only validation with pseudo-classes</p>
+
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="John Doe" required minlength="2">
+      <p class="helper">At least 2 characters</p>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="john@example.com" required>
+      <p class="helper">Must contain @</p>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Min 6 characters" required minlength="6">
+      <p class="helper">At least 6 characters</p>
+    </div>
+
+    <div class="form-group">
+      <label for="website">Website</label>
+      <input type="url" id="website" placeholder="https://example.com">
+      <p class="helper">Optional — must start with https://</p>
+    </div>
+
+    <button type="submit" class="form__submit">Sign Up</button>
+  </form>
+
+</body>
+</html>

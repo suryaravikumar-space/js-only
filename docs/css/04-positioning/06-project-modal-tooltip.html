@@ -1,0 +1,234 @@
+<!-- ============================================================
+     MINI PROJECT: Modal + Tooltip + Sticky Header
+     SKILLS PRACTICED: absolute, fixed, sticky, z-index, inset
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Positioning Project</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    /* ===== FIXED NAVBAR ===== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;              /* stretches full width */
+      height: 56px;
+      background: #1a1a2e;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      z-index: 300;           /* above sticky and content */
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    body { padding-top: 56px; } /* compensate for fixed navbar */
+
+    /* ===== STICKY SECTION HEADER ===== */
+    .section-header {
+      position: sticky;
+      top: 56px;              /* stick below the fixed navbar */
+      background: #e8f4fd;
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      border-bottom: 1px solid #b8daef;
+      z-index: 200;           /* below navbar, above content */
+    }
+
+    .content {
+      padding: 1.5rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .content p { margin-bottom: 1rem; }
+
+    /* ===== CARD WITH BADGE (absolute) ===== */
+    .card {
+      position: relative;     /* reference point for badge */
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .card__badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;           /* slightly outside the card */
+      background: #dc3545;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    /* ===== TOOLTIP (absolute inside relative) ===== */
+    .tooltip-wrapper {
+      position: relative;
+      display: inline-block;
+      color: #007bff;
+      text-decoration: underline dotted;
+      cursor: help;
+    }
+
+    .tooltip-wrapper .tip {
+      position: absolute;
+      bottom: 100%;           /* above the element */
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .tooltip-wrapper:hover .tip {
+      opacity: 1;
+    }
+
+    /* ===== MODAL OVERLAY (fixed) ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;               /* top:0 right:0 bottom:0 left:0 */
+      background: rgba(0,0,0,0.5);
+      display: none;           /* hidden by default */
+      z-index: 400;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 400px;
+      position: relative;      /* for close button positioning */
+      z-index: 500;
+    }
+
+    .modal__close {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .btn {
+      padding: 0.5rem 1.25rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    /* ===== BACK TO TOP (fixed) ===== */
+    .back-to-top {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #333;
+      color: white;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FIXED NAVBAR -->
+  <nav class="navbar">Positioning Demo — Fixed Navbar</nav>
+
+  <!-- SECTION 1 -->
+  <div class="section-header">Section 1 — Sticky Header (scrolls, then sticks)</div>
+  <div class="content">
+    <p>Scroll down to see the sticky header stick below the fixed navbar. The fixed navbar stays at the very top always. The sticky header scrolls normally until it reaches the navbar, then sticks.</p>
+
+    <!-- CARD WITH BADGE -->
+    <div class="card">
+      <div class="card__badge">3</div>
+      <h3>Card with Badge</h3>
+      <p>The red badge uses <strong>position: absolute</strong> relative to this card (position: relative). It sits slightly outside the card's top-right corner.</p>
+    </div>
+
+    <p>Here's a
+      <span class="tooltip-wrapper">
+        tooltip example
+        <span class="tip">I'm positioned absolute inside relative parent!</span>
+      </span>
+      — hover over the blue text.
+    </p>
+
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+    <button class="btn" onclick="document.querySelector('.modal-overlay').classList.add('active')">
+      Open Modal (fixed positioning)
+    </button>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section-header">Section 2 — Another Sticky Header</div>
+  <div class="content">
+    <p>Each section has its own sticky header. They stack and replace each other as you scroll through sections.</p>
+    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+    <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    <p>More content to make the page scrollable...</p>
+    <p>Keep scrolling to test the sticky and fixed behaviors.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    <p>Sed do eiusmod tempor incididunt ut labore.</p>
+    <p>End of content.</p>
+  </div>
+
+  <!-- MODAL (fixed overlay) -->
+  <div class="modal-overlay" onclick="this.classList.remove('active')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="modal__close" onclick="document.querySelector('.modal-overlay').classList.remove('active')">&times;</button>
+      <h3>Modal Window</h3>
+      <p style="margin-top:0.5rem; color:#666;">This uses <strong>position: fixed</strong> with <strong>inset: 0</strong> for the overlay. The modal itself is centered with flexbox. It stays on screen even when you scroll.</p>
+    </div>
+  </div>
+
+  <!-- BACK TO TOP (fixed) -->
+  <button class="back-to-top" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+/* ============================================================
+   PROFILE CARD PROJECT — Line-by-Line Explanation
+   (Companion to 12-project-profile-card.html)
+   ============================================================ */
+
+
+/* ── .profile { display: block; width: 320px; } ───────────
+   block = takes full width, starts new line.
+   We set explicit width: 320px so the card has a fixed size.
+   padding: 2rem = 32px of inner space on all sides.
+   border: 1px solid = thin visible edge (px for borders).
+*/
+
+
+/* ── .profile__avatar { display: block; margin: 0 auto 1rem; }
+   display: block → takes full width of parent.
+   margin: 0 auto 1rem →
+     0 on top, auto on left AND right, 1rem on bottom.
+     auto left/right on a block element with set width = CENTERED.
+   border-radius: 50% → makes a circle (works on square elements).
+*/
+
+
+/* ── .profile__name { display: block; margin-bottom: 0.25rem; }
+   Even though <span> is inline by default, we make it block
+   so it takes full width and stacks vertically.
+   margin-bottom pushes the next element (role) away.
+*/
+
+
+/* ── .profile__stats { border-top: 1px solid #eee; padding-top: 1.5rem; }
+   border-top = visual separator line.
+   padding-top = space BETWEEN the border and the stats content.
+   (padding is inside, margin would be outside)
+*/
+
+
+/* ── .profile__stat { display: inline-block; width: 30%; }
+   inline-block = sits on the SAME LINE as siblings
+   BUT can have width and height (unlike inline).
+   width: 30% → each stat takes ~30% of parent width.
+   3 stats × 30% = 90% → fits with small gaps.
+*/
+
+
+/* ── .profile__stat-number { display: block; }
+   INSIDE an inline-block parent.
+   block makes the number stack ON TOP of the label.
+   Without this, number and label would sit side by side.
+
+   VISUAL:
+   ┌──inline-block──┐ ┌──inline-block──┐
+   │  [block] 128   │ │  [block] 2.4k  │
+   │  [block] Posts  │ │  [block] Foll  │
+   └────────────────┘ └────────────────┘
+*/
+
+
+/* ── .profile__button { display: inline-block; }
+   inline-block = respects width/padding like block,
+   but only takes as much width as needed (like inline).
+   margin-top: 1.5rem pushes it down from the stats.
+*/
+
+
+/* ── .profile__hidden-visible { visibility: hidden; }
+   The element is INVISIBLE but still takes space.
+   You can see a gap at the bottom of the card.
+
+   If you change to display: none →
+   The element is REMOVED from layout, no gap.
+
+   KEY INTERVIEW DIFFERENCE:
+   visibility: hidden = invisible, takes space
+   display: none = removed, no space
+*/

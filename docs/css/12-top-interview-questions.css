@@ -1,0 +1,153 @@
+/* ============================================================
+   TOP CSS INTERVIEW QUESTIONS — Most Frequently Asked
+   ============================================================
+   These are ADDITIONAL questions not covered in topic files.
+   ============================================================ */
+
+
+/* Q1: What is the difference between reset.css and normalize.css?
+   ──────────────────────────────────────────────────────────────
+   reset.css:     removes ALL browser default styles (everything to 0)
+   normalize.css: makes defaults CONSISTENT across browsers (keeps useful defaults)
+   normalize is preferred — less aggressive, more predictable.
+*/
+
+
+/* Q2: What is the cascade in CSS?
+   ──────────────────────────────────────────────────────────────
+   The algorithm that decides which styles apply when conflicts exist.
+   Priority order:
+   1. Importance (!important)
+   2. Specificity (inline > ID > class > element)
+   3. Source order (last rule wins if specificity is equal)
+*/
+
+
+/* Q3: What is the difference between em, rem, px, and %?
+   ──────────────────────────────────────────────────────────────
+   px:  absolute, fixed size
+   em:  relative to parent's font-size (compounds)
+   rem: relative to root font-size (predictable)
+   %:   relative to parent's dimension
+*/
+
+
+/* Q4: How do you hide an element? What are the different ways?
+   ────────────────────────────────────────────────────────────── */
+.way1 { display: none; }            /* removed from flow, not accessible */
+.way2 { visibility: hidden; }       /* invisible, still takes space */
+.way3 { opacity: 0; }               /* transparent, still takes space, still clickable */
+.way4 {                              /* visually hidden but accessible to screen readers */
+  position: absolute;
+  width: 1px; height: 1px;
+  clip: rect(0,0,0,0);
+  overflow: hidden;
+}
+
+
+/* Q5: What is the difference between absolute and fixed positioning?
+   ──────────────────────────────────────────────────────────────
+   absolute: positioned relative to nearest positioned ANCESTOR
+   fixed:    positioned relative to VIEWPORT (doesn't scroll)
+*/
+
+
+/* Q6: What is a CSS preprocessor? Name some.
+   ──────────────────────────────────────────────────────────────
+   A tool that extends CSS with variables, nesting, mixins, etc.
+   Compiles to regular CSS.
+   Examples: SASS/SCSS, LESS, Stylus.
+   Modern CSS has variables and nesting now, reducing the need.
+*/
+
+
+/* Q7: What is the difference between content-box and border-box?
+   ──────────────────────────────────────────────────────────────
+   content-box: width = content only (padding/border add to total)
+   border-box:  width = content + padding + border (total width)
+   Always use border-box.
+*/
+
+
+/* Q8: What is the CSS painting order (stacking without z-index)?
+   ──────────────────────────────────────────────────────────────
+   1. Background and borders of root
+   2. Non-positioned block elements (in DOM order)
+   3. Floated elements
+   4. Non-positioned inline elements
+   5. Positioned elements (in DOM order, then z-index)
+*/
+
+
+/* Q9: What is reflow and repaint?
+   ──────────────────────────────────────────────────────────────
+   Reflow (layout): browser recalculates positions/sizes.
+     Triggered by: changing width, height, margin, padding, font-size,
+                   adding/removing DOM elements.
+     EXPENSIVE.
+
+   Repaint: browser redraws pixels without layout change.
+     Triggered by: changing color, background, visibility, box-shadow.
+     Less expensive.
+
+   Best practice: batch DOM reads/writes, use transform for animations.
+*/
+
+
+/* Q10: What is the difference between inline and inline-block?
+   ──────────────────────────────────────────────────────────────
+   inline:       can't set width/height, vertical margin ignored
+   inline-block: can set width/height, all margins work, stays on same line
+*/
+
+
+/* Q11: How does z-index work?
+   ──────────────────────────────────────────────────────────────
+   Only works on positioned elements (not static).
+   Higher value = on top.
+   Creates stacking context — children z-index only competes within parent.
+*/
+
+
+/* Q12: How do you make a triangle in CSS?
+   ────────────────────────────────────────────────────────────── */
+.triangle {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 30px solid #333;
+  /* Only the bottom border is visible → triangle pointing up */
+}
+
+
+/* Q13: What are CSS layers (@layer)?
+   ──────────────────────────────────────────────────────────────
+   @layer lets you control cascade priority of style groups.
+   Later layers override earlier ones regardless of specificity.
+*/
+@layer base, components, utilities;
+@layer base { a { color: blue; } }
+@layer utilities { .text-red { color: red; } }
+
+
+/* Q14: What is currentColor?
+   ──────────────────────────────────────────────────────────────
+   A keyword that refers to the element's computed color value.
+   Useful for making borders, shadows, SVGs match text color.
+*/
+.icon-button {
+  color: blue;
+  border: 2px solid currentColor;  /* border is also blue */
+  /* Change color and border changes too */
+}
+
+
+/* Q15: What is the difference between max-width and min-width?
+   ──────────────────────────────────────────────────────────────
+   max-width: element can be SMALLER, but not LARGER than this
+   min-width: element can be LARGER, but not SMALLER than this
+
+   Common pattern:
+   width: 100%; max-width: 1200px; → responsive but capped
+*/

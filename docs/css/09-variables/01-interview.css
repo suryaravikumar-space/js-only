@@ -1,0 +1,59 @@
+/* ============================================================
+   CSS VARIABLES — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: What are CSS custom properties? How do they differ from SASS variables?
+   ──────────────────────────────────────────────────────────────
+   CSS variables: --name, live in browser, cascade, can change at runtime.
+   SASS variables: $name, compiled away at build time, static.
+
+   CSS variables can be changed with JavaScript:
+   document.documentElement.style.setProperty('--color', 'red');
+   SASS variables cannot.
+*/
+
+
+/* Q2: Where should you define CSS variables?
+   ──────────────────────────────────────────────────────────────
+   :root for global variables (accessible everywhere).
+   On specific selectors for scoped/local variables.
+   Variables cascade down — children inherit parent's variables.
+*/
+
+
+/* Q3: What happens if a CSS variable is undefined?
+   ──────────────────────────────────────────────────────────────
+   The property becomes invalid. Use a fallback:
+   color: var(--text, black);  ← uses black if --text undefined.
+*/
+
+
+/* Q4: Can CSS variables be used in media queries?
+   ──────────────────────────────────────────────────────────────
+   NO. You cannot do: @media (min-width: var(--breakpoint))
+   Variables can only be used in property VALUES, not selectors
+   or media query conditions.
+*/
+
+
+/* Q5: How do you implement dark mode with CSS variables?
+   ────────────────────────────────────────────────────────────── */
+:root { --bg: white; --text: black; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #1a1a1a; --text: #eee; }
+}
+/* Or toggle with a class: */
+.dark { --bg: #1a1a1a; --text: #eee; }
+
+
+/* Q6: Can you animate CSS variables?
+   ──────────────────────────────────────────────────────────────
+   Not directly by default. But you can with @property:
+*/
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+/* Now --angle can be transitioned/animated */

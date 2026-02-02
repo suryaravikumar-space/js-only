@@ -1,0 +1,243 @@
+<!-- ============================================================
+     MINI PROJECT: Pricing Card
+     SKILLS PRACTICED: rem, em, %, clamp(), box-sizing, ch
+     ============================================================
+     Open this file in a browser to see the result.
+     Resize the window to see responsive behavior.
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing Card — CSS Units Project</title>
+  <style>
+    /* ─────────────────────────────────────────────────────────
+       DEVELOPER APPROACH — How I built this card step by step
+
+       STEP 1 (Structure): What HTML do I need?
+       → A card container with: plan name, price, feature list, button.
+       → Single component, no complex layout needed.
+
+       STEP 2 (Layout): Outside in.
+       → Body: center the card (flex center center).
+       → Card: stack children vertically (default block flow — no flex needed).
+
+       STEP 3 (Spacing): Margin vs padding?
+       → Card padding: breathing room inside.
+       → margin-bottom on children: space between elements.
+
+       STEP 4 (Units): What unit for what?
+       → Font sizes: rem (scales with user preference).
+       → Responsive fonts: clamp(min, preferred, max).
+       → Spacing: rem. Letter-spacing: em (scales with text).
+       → Button padding: em (scales with button's own font).
+       → Shadows/borders: px (decorative, shouldn't scale).
+       → Line length: ch (character-based readability limit).
+       ────────────────────────────────────────────────────── */
+
+
+    /* RESET
+       box-sizing: border-box
+         → width = content + padding + border.
+         → Without it: 380px card + 32px padding each side = 444px total.
+         → With it: 380px total, content shrinks to fit. Predictable.
+
+       margin/padding: 0
+         → Removes browser defaults (body has 8px margin, ul has padding).
+    */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 62.5% TRICK
+       Browser default: 16px. 62.5% of 16px = 10px. Now 1rem = 10px.
+       Makes rem math easy: 1.6rem = 16px, 2.4rem = 24px, 3.2rem = 32px.
+       Actual text size is set on body (1.6rem = 16px).
+       If user sets browser to 20px: 62.5% of 20px = 12.5px.
+       Everything scales proportionally — accessibility preserved.
+    */
+    html {
+      font-size: 62.5%;
+    }
+
+    /* BODY
+       font-size: 1.6rem → 16px (because of the 62.5% trick).
+
+       line-height: 1.5 → UNITLESS. Means 1.5 × current font-size.
+         If element has font-size 32px → line-height = 48px.
+         If we wrote "24px" instead, ALL elements get 24px → large text overlaps.
+         ALWAYS use unitless for line-height.
+
+       min-height: 100dvh → full viewport height.
+         dvh = dynamic viewport height. On mobile, accounts for
+         the shrinking/expanding address bar. vh doesn't.
+
+       display: flex + justify/align: center → centers the card both ways.
+    */
+    body {
+      font-family: system-ui, sans-serif;
+      font-size: 1.6rem;
+      line-height: 1.5;
+      background: #f0f2f5;
+      min-height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    /* CARD CONTAINER
+       width: 100% → fills parent on small screens (responsive).
+       max-width: 38rem → caps at 380px. Without this, card stretches
+         to full screen width on desktop — text lines too long, looks bad.
+       padding: 3.2rem → 32px inner breathing room.
+       border-radius: 1.2rem → 12px rounded corners.
+       box-shadow: px values → shadows are decorative, don't need to scale.
+       text-align: center → all inline content centers.
+    */
+    .pricing-card {
+      background: white;
+      width: 100%;
+      max-width: 38rem;
+      padding: 3.2rem;
+      border-radius: 1.2rem;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    /* PLAN NAME
+       clamp(1.2rem, 2vw, 1.6rem):
+         min: 1.2rem (12px) on tiny screens.
+         preferred: 2vw (scales fluidly with viewport).
+         max: 1.6rem (16px) on large screens.
+         Font smoothly scales between bounds — no media queries needed.
+
+       letter-spacing: 0.15em → EM here, not rem!
+         em = relative to THIS element's font-size.
+         If font-size is 16px → spacing = 2.4px.
+         If we used px, spacing wouldn't adjust when font changes.
+    */
+    .pricing-card__plan {
+      font-size: clamp(1.2rem, 2vw, 1.6rem);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #007bff;
+      margin-bottom: 0.8rem;
+    }
+
+    /* PRICE
+       clamp(3.6rem, 8vw, 5.6rem) → big responsive number.
+         On 375px phone: 8vw = 30px → uses min (36px).
+         On 700px tablet: 8vw = 56px → uses max (56px).
+
+       line-height: 1.1 → tighter for large text.
+         Large text with 1.5 line-height has too much gap.
+         1.1 keeps it compact. Only do this for display text.
+    */
+    .pricing-card__price {
+      font-size: clamp(3.6rem, 8vw, 5.6rem);
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.1;
+    }
+
+    /* /month LABEL
+       font-size: 0.4em → EM, not rem!
+         em = relative to PARENT's computed font-size.
+         If price is 56px → 0.4 × 56 = 22.4px.
+         If price shrinks to 36px → 0.4 × 36 = 14.4px.
+         Label stays proportional to the price number.
+         rem would give a FIXED size regardless of the price.
+    */
+    .pricing-card__price span {
+      font-size: 0.4em;
+      color: #888;
+      font-weight: 400;
+    }
+
+    /* FEATURES LIST
+       max-width: 30ch → ch = width of the "0" character.
+         30ch ≈ 30 characters per line. Keeps list compact.
+       margin-left/right: auto → centers a block with set max-width.
+       text-align: left → overrides card's text-align: center.
+    */
+    .pricing-card__features {
+      list-style: none;
+      margin: 2.4rem 0;
+      max-width: 30ch;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    /* LIST ITEMS
+       border-bottom: 1px solid → px for thin lines.
+         1px = always 1 pixel. rem would make borders thicker
+         on large-font settings — looks wrong for hairline borders.
+       li::before → inserts decorative checkmark.
+         content: '✓ ' is decorative — the real info is in HTML.
+    */
+    .pricing-card__features li {
+      padding: 0.8rem 0;
+      border-bottom: 1px solid #eee;
+      font-size: 1.4rem;
+      color: #555;
+    }
+
+    .pricing-card__features li::before {
+      content: '✓ ';
+      color: #28a745;
+      font-weight: bold;
+    }
+
+    /* BUTTON
+       padding: 0.75em 2em → EM, not rem!
+         em = relative to the BUTTON's own font-size (1.6rem = 16px).
+         padding-top/bottom = 0.75 × 16 = 12px.
+         padding-left/right = 2 × 16 = 32px.
+         If you make a bigger button (font-size: 2rem), padding auto-scales.
+         One button class works for all sizes.
+
+       border-radius: 0.5em → also scales with button's font.
+       width: 100% → fills the card. % = relative to parent width.
+       transition: background 0.3s ease → smooth hover color change.
+         Specifying "background" not "all" → better performance.
+    */
+    .pricing-card__button {
+      display: inline-block;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 1.6rem;
+      padding: 0.75em 2em;
+      border-radius: 0.5em;
+      width: 100%;
+      transition: background 0.3s ease;
+    }
+
+    .pricing-card__button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="pricing-card">
+    <p class="pricing-card__plan">Pro Plan</p>
+    <p class="pricing-card__price">$29<span>/month</span></p>
+    <ul class="pricing-card__features">
+      <li>Unlimited projects</li>
+      <li>Priority support</li>
+      <li>Custom domain</li>
+      <li>Analytics dashboard</li>
+      <li>Team collaboration</li>
+    </ul>
+    <button class="pricing-card__button">Get Started</button>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+/* ============================================================
+   POSITION: absolute
+   ============================================================
+
+   Element is REMOVED from normal flow (takes no space).
+   Positioned relative to its NEAREST POSITIONED ANCESTOR.
+   "Positioned" = any ancestor with position other than static.
+
+   If no positioned ancestor → positions relative to <html>.
+
+   ============================================================ */
+
+
+.parent {
+  position: relative;    /* THIS becomes the reference point */
+  width: 400px;
+  height: 300px;
+  background: lightgray;
+}
+
+.child-absolute {
+  position: absolute;
+  top: 0;                /* 0px from parent's TOP edge */
+  right: 0;              /* 0px from parent's RIGHT edge */
+  /* This puts the child in the top-right corner of .parent */
+}
+
+
+/* COMMON PATTERNS */
+
+/* Center absolute element */
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* top/left move to center of parent,
+     translate pulls it back by half its own size */
+}
+
+/* Overlay / Badge */
+.card {
+  position: relative;    /* reference point */
+}
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;           /* sits on top-right corner, slightly outside */
+  background: red;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+}
+
+/* Full overlay */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;             /* stretches to fill entire parent */
+  /* shorthand: inset: 0; */
+  background: rgba(0,0,0,0.5);
+}
+
+
+/* VISUAL:
+
+   ┌─── .parent (relative) ──────────┐
+   │                        ┌──────┐ │
+   │                        │badge │ │ ← absolute, top:0 right:0
+   │                        └──────┘ │
+   │                                 │
+   │    ┌────────┐                   │
+   │    │centered│                   │ ← absolute, top:50% left:50%
+   │    └────────┘                   │
+   │                                 │
+   └─────────────────────────────────┘
+*/

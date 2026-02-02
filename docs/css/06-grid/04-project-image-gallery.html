@@ -1,0 +1,157 @@
+<!-- ============================================================
+     MINI PROJECT: Image Gallery with Grid
+     SKILLS: grid-template-columns, auto-fit, minmax, span,
+             grid-template-areas, grid-row, grid-column
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery — Grid Project</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #1a1a1a;
+      padding: 1.5rem;
+      color: white;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+    }
+
+
+    /* ===== AUTO-FIT GALLERY =====
+       repeat(auto-fit, minmax(200px, 1fr)):
+       - auto-fit: create as many columns as can fit
+       - minmax(200px, 1fr): each column is at least 200px,
+         grows up to 1fr (equal share of remaining space)
+       - On a 900px screen: 4 columns of ~225px each
+       - On a 500px screen: 2 columns of ~250px each
+       - On a 300px screen: 1 column of 300px
+       NO media queries needed!
+    */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 3rem;
+    }
+
+    /* Each gallery item is a colored box.
+       aspect-ratio: 1 makes it a SQUARE.
+       Without aspect-ratio, height depends on content (empty = 0). */
+    .gallery__item {
+      background: #333;
+      border-radius: 8px;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: #888;
+      transition: transform 0.2s ease;
+    }
+
+    .gallery__item:hover {
+      transform: scale(1.03);
+    }
+
+
+    /* ===== FEATURED GALLERY (grid-column/row spanning) =====
+       Explicit 4-column grid.
+       Some items span multiple columns/rows for a magazine look.
+    */
+    .featured {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 180px;
+      /* grid-auto-rows: sets the height for automatically created rows.
+         Every row is 180px tall. */
+      gap: 0.75rem;
+    }
+
+    /* grid-column: span 2 → this item takes 2 columns.
+       grid-row: span 2 → this item takes 2 rows.
+       So it becomes a 2×2 block (360px × 360px). */
+    .featured__item--large {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    /* grid-column: span 2 → wide but 1 row tall.
+       Takes 2 columns, 1 row. */
+    .featured__item--wide {
+      grid-column: span 2;
+    }
+
+    /* grid-row: span 2 → tall but 1 column wide.
+       Takes 1 column, 2 rows. */
+    .featured__item--tall {
+      grid-row: span 2;
+    }
+
+    .featured__item {
+      background: #2a2a2a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    /* Colors for visual distinction */
+    .featured__item:nth-child(1)  { background: #1e3a5f; }
+    .featured__item:nth-child(2)  { background: #2d4a3e; }
+    .featured__item:nth-child(3)  { background: #4a2d3e; }
+    .featured__item:nth-child(4)  { background: #3e3a2d; }
+    .featured__item:nth-child(5)  { background: #2d2d4a; }
+    .featured__item:nth-child(6)  { background: #4a3e2d; }
+    .featured__item:nth-child(7)  { background: #2d4a4a; }
+
+    .section-label {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>CSS Grid Gallery</h1>
+
+  <!-- AUTO-FIT GALLERY: responsive without media queries -->
+  <p class="section-label">Auto-fit gallery (resize window to see columns change)</p>
+  <div class="gallery">
+    <div class="gallery__item">1</div>
+    <div class="gallery__item">2</div>
+    <div class="gallery__item">3</div>
+    <div class="gallery__item">4</div>
+    <div class="gallery__item">5</div>
+    <div class="gallery__item">6</div>
+    <div class="gallery__item">7</div>
+    <div class="gallery__item">8</div>
+  </div>
+
+  <!-- FEATURED GALLERY: items spanning multiple cells -->
+  <p class="section-label">Featured layout (span 2 columns/rows)</p>
+  <div class="featured">
+    <div class="featured__item featured__item--large">span 2×2</div>
+    <div class="featured__item">1×1</div>
+    <div class="featured__item">1×1</div>
+    <div class="featured__item featured__item--tall">span 1×2</div>
+    <div class="featured__item featured__item--wide">span 2×1</div>
+    <div class="featured__item">1×1</div>
+    <div class="featured__item">1×1</div>
+  </div>
+
+</body>
+</html>

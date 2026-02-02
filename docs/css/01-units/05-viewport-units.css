@@ -1,0 +1,53 @@
+/* ============================================================
+   Viewport Units — vw, vh, vmin, vmax, dvh
+   ============================================================
+
+   vw   = 1% of viewport WIDTH
+   vh   = 1% of viewport HEIGHT
+   vmin = 1% of SMALLER dimension
+   vmax = 1% of LARGER dimension
+
+   On a 1200x800 viewport:
+   1vw   = 12px     1vh   = 8px
+   1vmin = 8px      1vmax = 12px
+   ============================================================ */
+
+
+/* --- vw --- */
+.full-width {
+  width: 100vw;  /* GOTCHA: includes scrollbar, may cause horizontal scroll */
+}
+
+/* Responsive typography */
+.heading {
+  font-size: 5vw;  /* 1200px screen = 60px, 375px phone = 18.75px */
+}
+
+/* Better: use clamp() for min/max bounds */
+.heading-safe {
+  font-size: clamp(1.5rem, 5vw, 4rem);
+  /* min: 24px, preferred: 5vw, max: 64px */
+}
+
+
+/* --- vh --- */
+.hero {
+  height: 100vh;  /* Full screen height */
+}
+
+/* MOBILE GOTCHA: 100vh can be taller than visible area
+   because mobile browsers hide/show the URL bar */
+
+.hero-fixed {
+  height: 100dvh;  /* dvh = Dynamic Viewport Height */
+  /* svh = Small (URL bar visible)
+     lvh = Large (URL bar hidden)
+     dvh = Updates in real-time */
+}
+
+
+/* --- vmin / vmax --- */
+.responsive-square {
+  width: 50vmin;
+  height: 50vmin;  /* Always a square, fits any orientation */
+}

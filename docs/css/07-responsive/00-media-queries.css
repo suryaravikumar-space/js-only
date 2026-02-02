@@ -1,0 +1,79 @@
+/* ============================================================
+   MEDIA QUERIES — Apply styles based on screen conditions
+   ============================================================
+
+   Syntax: @media (condition) { styles }
+
+   APPROACH: Mobile-first (start with small screen, add for larger)
+   Use min-width for mobile-first, max-width for desktop-first.
+   ============================================================ */
+
+
+/* --- Common Breakpoints --- */
+
+/* Mobile first: base styles = mobile */
+.container {
+  width: 100%;
+  padding: 1rem;
+}
+
+/* Tablet (768px and up) */
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+}
+
+/* Desktop (1024px and up) */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+/* Large desktop (1200px and up) */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+
+/* --- Use em for media queries (handles zoom better) ---
+   768px / 16 = 48em
+   1024px / 16 = 64em
+   1200px / 16 = 75em
+*/
+
+@media (min-width: 48em) {  /* 768px */ }
+@media (min-width: 64em) {  /* 1024px */ }
+
+
+/* --- Other media features --- */
+
+/* Orientation */
+@media (orientation: landscape) { /* wider than tall */ }
+@media (orientation: portrait)  { /* taller than wide */ }
+
+/* Dark mode preference */
+@media (prefers-color-scheme: dark) {
+  body { background: #1a1a1a; color: #eee; }
+}
+
+/* Reduced motion (accessibility) */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* Hover capability (touch vs mouse) */
+@media (hover: hover) {
+  /* Device has a mouse — safe to use hover effects */
+  .button:hover { background: blue; }
+}
+
+/* Print */
+@media print {
+  .no-print { display: none; }
+  body { font-size: 12pt; }
+}

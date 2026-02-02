@@ -1,0 +1,223 @@
+<!-- ============================================================
+     MINI PROJECT: Magazine Text Wrap + BFC Demo
+     SKILLS: float, clear, BFC, display: flow-root, margin collapse
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Float & BFC — Project</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: #f9f6f0;
+      padding: 2rem;
+      line-height: 1.8;
+      color: #333;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.25rem; margin: 2rem 0 1rem; color: #666; }
+
+
+    /* ===== DEMO 1: TEXT WRAPPING AROUND IMAGE =====
+
+       float: left → image is pulled to the left.
+       Text flows AROUND the right side of the image.
+       This is the ORIGINAL purpose of float.
+
+       The image is removed from normal flow,
+       but inline content (text) wraps around it.
+       Block elements ignore the float (they go behind it).
+
+       margin: 0 1.5rem 1rem 0:
+       - 0 top
+       - 1.5rem right (space between image and text)
+       - 1rem bottom (space below image)
+       - 0 left
+    */
+    .article__image {
+      float: left;
+      width: 200px;
+      height: 150px;
+      background: #c4a882;
+      border-radius: 8px;
+      margin: 0 1.5rem 1rem 0;
+    }
+
+    /*
+      .article has display: flow-root.
+
+      WHY: Without it, the .article container would COLLAPSE
+      (have 0 height) if the image is taller than the text.
+      Because floated elements are removed from flow,
+      the parent doesn't "see" them for height calculation.
+
+      display: flow-root creates a BFC (Block Formatting Context).
+      A BFC contains its floats — the parent now includes
+      the floated image when calculating its height.
+    */
+    .article {
+      display: flow-root;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+
+
+    /* ===== DEMO 2: FLOAT COLLAPSE PROBLEM ===== */
+
+    /*
+      .broken-container does NOT have flow-root.
+      Both children float → parent has NO in-flow children.
+      Parent collapses to just its padding height.
+
+      The red dashed border shows the collapsed parent.
+      The gray boxes (floated children) extend BELOW the parent.
+    */
+    .broken-container {
+      /* NO display: flow-root */
+      background: #fff0f0;
+      padding: 1rem;
+      border: 2px dashed #dc3545;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+
+    /*
+      .fixed-container HAS display: flow-root.
+      Same children, but parent now contains them.
+      Green border wraps around everything properly.
+    */
+    .fixed-container {
+      display: flow-root;
+      background: #f0fff0;
+      padding: 1rem;
+      border: 2px dashed #28a745;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+
+    .float-box {
+      float: left;
+      width: 120px;
+      height: 80px;
+      background: #888;
+      margin: 0.5rem;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-family: system-ui;
+      font-size: 0.8rem;
+    }
+
+
+    /* ===== DEMO 3: MARGIN COLLAPSE vs BFC =====
+
+       Without BFC: child's margin-top escapes the parent.
+       The 40px gap appears ABOVE the red box, not inside it.
+
+       With BFC (flow-root): margin stays inside the parent.
+       The 40px gap is between the green box's top edge
+       and the child text.
+    */
+    .margin-demo {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .margin-broken {
+      /* No BFC */
+      background: #fff0f0;
+      border: 2px dashed #dc3545;
+      border-radius: 8px;
+      width: 50%;
+    }
+
+    .margin-fixed {
+      display: flow-root;
+      /*
+        flow-root creates a BFC boundary.
+        Child margins can't escape through the boundary.
+        The 40px margin stays INSIDE this container.
+      */
+      background: #f0fff0;
+      border: 2px dashed #28a745;
+      border-radius: 8px;
+      width: 50%;
+    }
+
+    .margin-child {
+      margin: 40px;
+      padding: 1rem;
+      background: white;
+      border-radius: 4px;
+      font-family: system-ui;
+      font-size: 0.85rem;
+    }
+
+
+    .label {
+      font-family: system-ui;
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h1>Float & BFC Demo</h1>
+
+    <!-- DEMO 1: Text Wrap -->
+    <h2>1. Float: Text Wrapping (original purpose)</h2>
+    <div class="article">
+      <div class="article__image"></div>
+      <p>This text wraps around the floated image on the left. Float was originally designed for this — magazine-style text wrapping. The image has <code>float: left</code> and the text naturally flows around it. The parent uses <code>display: flow-root</code> to contain the float and prevent height collapse.</p>
+      <p>When the text extends below the image, it fills the full width again. This is the only modern use case for float — everything else should use flexbox or grid.</p>
+    </div>
+
+    <!-- DEMO 2: Float Collapse -->
+    <h2>2. Float Collapse Problem</h2>
+
+    <p class="label">Without flow-root (broken — parent collapses):</p>
+    <div class="broken-container">
+      <div class="float-box">Float 1</div>
+      <div class="float-box">Float 2</div>
+      <div class="float-box">Float 3</div>
+    </div>
+
+    <p class="label">With display: flow-root (fixed — parent wraps children):</p>
+    <div class="fixed-container">
+      <div class="float-box">Float 1</div>
+      <div class="float-box">Float 2</div>
+      <div class="float-box">Float 3</div>
+    </div>
+
+    <!-- DEMO 3: Margin Collapse -->
+    <h2>3. Margin Collapse vs BFC</h2>
+    <div class="margin-demo">
+      <div class="margin-broken">
+        <div class="margin-child">No BFC: my 40px margin-top escapes the parent</div>
+      </div>
+      <div class="margin-fixed">
+        <div class="margin-child">BFC (flow-root): my 40px margin stays inside</div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+/* ============================================================
+   em — Relative to PARENT's font-size
+   ============================================================
+
+   For font-size: 1em = parent's font-size
+   For padding/margin: 1em = THIS element's font-size
+
+   DANGER: em compounds through nesting!
+   ============================================================ */
+
+/* Compounding problem */
+.grandparent { font-size: 16px; }
+.parent      { font-size: 1.5em; }  /* 16 × 1.5 = 24px */
+.child       { font-size: 1.5em; }  /* 24 × 1.5 = 36px */
+.grandchild  { font-size: 1.5em; }  /* 36 × 1.5 = 54px ← keeps growing! */
+
+
+/* GOOD USE: component spacing that scales with font */
+.button {
+  font-size: 16px;
+  padding: 0.5em 1em;     /* 8px 16px */
+  border-radius: 0.25em;  /* 4px */
+}
+
+.button-large {
+  font-size: 24px;         /* Change only this... */
+  padding: 0.5em 1em;      /* ...auto-scales to 12px 24px */
+  border-radius: 0.25em;   /* ...auto-scales to 6px */
+}

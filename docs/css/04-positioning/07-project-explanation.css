@@ -1,0 +1,119 @@
+/* ============================================================
+   MODAL + TOOLTIP + STICKY PROJECT — Line-by-Line Explanation
+   (Companion to 06-project-modal-tooltip.html)
+   ============================================================ */
+
+
+/* ── .navbar { position: fixed; top: 0; left: 0; right: 0; }
+   fixed = relative to VIEWPORT (browser window).
+   top: 0 = glued to top edge of screen.
+   left: 0; right: 0 = stretches full width.
+   Does NOT move when user scrolls.
+   z-index: 300 = above all other content.
+*/
+
+
+/* ── body { padding-top: 56px; } ──────────────────────────
+   CRITICAL: fixed elements are REMOVED from normal flow.
+   Without this padding, page content hides behind the navbar.
+   56px = height of the navbar.
+*/
+
+
+/* ── .section-header { position: sticky; top: 56px; }
+   sticky = scrolls normally UNTIL it reaches top: 56px.
+   Then it STICKS at 56px (right below the fixed navbar).
+   z-index: 200 = below navbar (300) but above content.
+
+   WHY top: 56px not top: 0?
+   Because the fixed navbar is 56px tall.
+   top: 0 would make it stick BEHIND the navbar.
+*/
+
+
+/* ── .card { position: relative; } ────────────────────────
+   relative on the card = makes it the REFERENCE POINT
+   for any absolute children inside it.
+   The card itself stays in normal flow (doesn't move).
+   This is the #1 use of position: relative.
+*/
+
+
+/* ── .card__badge { position: absolute; top: -10px; right: -10px; }
+   absolute = removed from flow, positioned relative to .card.
+   top: -10px = 10px ABOVE the card's top edge.
+   right: -10px = 10px OUTSIDE the card's right edge.
+   This places the badge on the corner, overlapping the edge.
+
+   NEGATIVE values move OUTSIDE the parent.
+   Positive values move INSIDE.
+*/
+
+
+/* ── .tooltip .tip { position: absolute; bottom: 100%; left: 50%; }
+   absolute inside .tooltip-wrapper (which is relative).
+   bottom: 100% = the tooltip's BOTTOM edge is at the
+   TOP of the parent (100% from bottom = all the way up).
+   left: 50% = starts at horizontal center of parent.
+   transform: translateX(-50%) = pulls left by half its own width
+   → perfectly centered above the parent.
+*/
+
+
+/* ── .tooltip .tip { opacity: 0; pointer-events: none; }
+   opacity: 0 = invisible but still in the DOM.
+   pointer-events: none = mouse clicks pass through it.
+   Without pointer-events: none, the invisible tooltip
+   would block clicks on elements beneath it.
+*/
+
+
+/* ── .tooltip-wrapper:hover .tip { opacity: 1; }
+   When you hover the wrapper, the tip becomes visible.
+   Combined with transition: opacity 0.2s → smooth fade in.
+*/
+
+
+/* ── .modal-overlay { position: fixed; inset: 0; }
+   fixed = covers the entire VIEWPORT.
+   inset: 0 = shorthand for top:0; right:0; bottom:0; left:0.
+   This creates a full-screen overlay.
+   background: rgba(0,0,0,0.5) = semi-transparent black.
+   z-index: 400 = above navbar and everything else.
+*/
+
+
+/* ── .modal-overlay { display: none; }
+   Hidden by default. JavaScript adds .active class.
+   .modal-overlay.active { display: flex; }
+   flex + justify-content: center + align-items: center
+   = modal box centered in the overlay.
+*/
+
+
+/* ── .modal { position: relative; z-index: 500; }
+   relative here so the close button (absolute) positions
+   relative to the modal box.
+   z-index: 500 = above the overlay (400).
+*/
+
+
+/* ── .modal__close { position: absolute; top: 0.75rem; right: 0.75rem; }
+   Positioned in the top-right corner of .modal.
+   absolute + parent is relative = corner positioning pattern.
+*/
+
+
+/* ── onclick="event.stopPropagation()" on .modal ──────────
+   The overlay has onclick to close.
+   Without stopPropagation, clicking INSIDE the modal
+   would bubble up to the overlay and close it.
+   stopPropagation prevents the click from reaching the overlay.
+*/
+
+
+/* ── .back-to-top { position: fixed; bottom: 1.5rem; right: 1.5rem; }
+   fixed = always visible in bottom-right corner.
+   Doesn't move with scroll.
+   z-index: 100 = lowest layer (just above normal content).
+*/

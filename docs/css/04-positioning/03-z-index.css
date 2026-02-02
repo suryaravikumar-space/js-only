@@ -1,0 +1,41 @@
+/* ============================================================
+   Z-INDEX — Controls stacking order (which element is on top)
+   ============================================================
+
+   ONLY works on POSITIONED elements (relative, absolute, fixed, sticky).
+   Does NOT work on static elements.
+
+   Higher z-index = closer to you = on top.
+   ============================================================ */
+
+.behind  { position: relative; z-index: 1; }
+.middle  { position: relative; z-index: 2; }
+.on-top  { position: relative; z-index: 3; }
+
+
+/* STACKING CONTEXT:
+   A z-index creates a new stacking context.
+   Children are stacked WITHIN their parent's context.
+   A child can NEVER appear above its parent's sibling
+   that has a higher z-index.
+*/
+
+/* Example:
+   .card-a  (z-index: 1)
+     .popup (z-index: 9999)    ← still behind card-b!
+   .card-b  (z-index: 2)
+
+   popup's 9999 only matters WITHIN card-a's context.
+   card-a (1) < card-b (2), so everything in card-a is behind card-b.
+*/
+
+
+/* COMMON Z-INDEX SCALE (real-world convention): */
+/* :root {
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-fixed:    300;
+  --z-modal-bg: 400;
+  --z-modal:    500;
+  --z-tooltip:  600;
+} */

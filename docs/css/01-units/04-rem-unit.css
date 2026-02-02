@@ -1,0 +1,36 @@
+/* ============================================================
+   rem — Relative to ROOT (<html>) font-size
+   ============================================================
+
+   1rem = <html> font-size (default: 16px)
+   NO compounding. Always predictable.
+   BEST UNIT FOR FONT SIZES (accessibility).
+   ============================================================ */
+
+html { font-size: 16px; } /* browser default */
+
+.heading { font-size: 2rem; }     /* Always 32px, no matter how nested */
+.text    { font-size: 1rem; }     /* Always 16px */
+.small   { font-size: 0.875rem; } /* Always 14px */
+
+
+/* 62.5% TRICK — makes rem math easy */
+html { font-size: 62.5%; }  /* 62.5% of 16px = 10px */
+
+/*
+   Now:
+   1rem   = 10px
+   1.4rem = 14px
+   1.6rem = 16px
+   2rem   = 20px
+   2.4rem = 24px
+
+   Still accessible — if user changes browser default to 20px,
+   62.5% of 20px = 12.5px, everything scales up.
+*/
+
+.card {
+  font-size: 1.6rem;         /* 16px */
+  padding: 2.4rem;           /* 24px */
+  margin-bottom: 3.2rem;     /* 32px */
+}

@@ -1,0 +1,76 @@
+/* ============================================================
+   FLOAT, CLEAR & BFC — Legacy Layout + Important Concept
+   ============================================================
+
+   Float was the ORIGINAL way to create layouts before Flexbox/Grid.
+   You don't need float for layout anymore, but you MUST know:
+   1. How it works (legacy code exists everywhere)
+   2. BFC (Block Formatting Context) — still very relevant
+
+   ============================================================ */
+
+
+/* --- float ---
+   Takes element OUT of normal flow.
+   Other content wraps around it.
+   Originally designed for text wrapping around images.
+*/
+
+.image-left {
+  float: left;
+  margin-right: 1rem;
+  /* Text flows around the right side */
+}
+
+
+/* --- The float problem ---
+   Parent collapses when all children are floated
+   because floated elements are "out of flow."
+*/
+
+.parent-broken {
+  /* If all children float, this has 0 height! */
+}
+
+/* FIX 1: clearfix (old way) */
+.clearfix::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+/* FIX 2: overflow (creates BFC) */
+.parent-fixed {
+  overflow: auto;   /* or overflow: hidden */
+}
+
+/* FIX 3: display: flow-root (modern, best) */
+.parent-modern {
+  display: flow-root;  /* creates BFC without side effects */
+}
+
+
+/* --- BFC (Block Formatting Context) ---
+   A BFC is a mini layout environment where:
+   1. Floats are contained (don't escape)
+   2. Margins don't collapse across the boundary
+   3. Content doesn't overlap floats
+
+   Created by:
+   - overflow: hidden/auto/scroll
+   - display: flow-root (best)
+   - display: flex or grid
+   - position: absolute or fixed
+   - float: left/right
+
+   WHY IT MATTERS:
+   - Prevents margin collapse between parent and child
+   - Contains floated children
+   - Prevents content from wrapping under floats
+*/
+
+/* Margin collapse prevention */
+.parent {
+  display: flow-root;  /* creates BFC */
+  /* Now child's margin-top won't collapse with parent */
+}

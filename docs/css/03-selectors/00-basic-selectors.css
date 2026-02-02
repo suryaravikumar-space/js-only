@@ -1,0 +1,42 @@
+/* ============================================================
+   CSS SELECTORS — How you TARGET elements to style them
+   ============================================================ */
+
+
+/* --- Universal Selector * ---
+   Selects EVERY element on the page */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+/* --- Element/Type Selector ---
+   Selects ALL elements of that HTML tag */
+p { color: #333; }
+h1 { font-size: 2rem; }
+a { text-decoration: none; }
+
+
+/* --- Class Selector . ---
+   Selects elements with that class attribute
+   ONE element can have MULTIPLE classes
+   MULTIPLE elements can share the SAME class */
+.card { background: white; }
+.card.active { border-color: blue; }  /* element with BOTH classes */
+
+
+/* --- ID Selector # ---
+   Selects the ONE element with that ID
+   IDs must be UNIQUE per page
+   AVOID for styling — too high specificity */
+#header { position: sticky; }
+
+
+/* --- Grouping Selector , ---
+   Apply same styles to multiple selectors */
+h1, h2, h3 {
+  font-family: Georgia, serif;
+  line-height: 1.2;
+}

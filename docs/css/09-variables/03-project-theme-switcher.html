@@ -1,0 +1,256 @@
+<!-- ============================================================
+     MINI PROJECT: Theme Switcher (Light/Dark)
+     SKILLS: CSS variables, :root, scoping, dark mode, JS toggle
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theme Switcher — CSS Variables Project</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+    /* ===== LIGHT THEME VARIABLES (default) =====
+
+       :root = the <html> element. Highest in the DOM.
+       Variables defined here are available EVERYWHERE.
+
+       Naming convention: --category-property
+       This makes it easy to find and group related variables.
+    */
+    :root {
+      --bg-primary: #ffffff;       /* main background */
+      --bg-secondary: #f5f5f5;    /* cards, sections */
+      --bg-accent: #007bff;       /* buttons, highlights */
+      --text-primary: #1a1a1a;    /* main text */
+      --text-secondary: #666666;  /* lighter text */
+      --text-on-accent: #ffffff;  /* text on colored backgrounds */
+      --border: #e0e0e0;          /* borders and dividers */
+      --shadow: rgba(0, 0, 0, 0.08);  /* box shadows */
+      --radius: 8px;              /* consistent border radius */
+      --transition: 0.3s ease;    /* consistent transition speed */
+    }
+
+
+    /* ===== DARK THEME VARIABLES =====
+
+       .dark on <html> OVERRIDES :root variables.
+       Because .dark is on the same element as :root,
+       but has higher specificity (class > pseudo-class).
+
+       All var() references automatically use the new values.
+       NO need to change any component CSS.
+    */
+    .dark {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --bg-accent: #4dabf7;
+      --text-primary: #e0e0e0;
+      --text-secondary: #a0a0a0;
+      --text-on-accent: #1a1a2e;
+      --border: #2a2a4a;
+      --shadow: rgba(0, 0, 0, 0.3);
+    }
+
+
+    /* ===== BASE STYLES =====
+
+       Every color uses var().
+       Switching themes = just changing variable values.
+       ZERO component CSS changes needed.
+
+       transition on background and color:
+       - Smooth color change when toggling themes.
+       - Without it, colors would snap instantly.
+    */
+    body {
+      font-family: system-ui, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background var(--transition), color var(--transition);
+      /*
+        var(--transition) = "0.3s ease" from our variables.
+        Yes, you can use variables inside other property values!
+      */
+    }
+
+
+    /* ===== HEADER ===== */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      /*
+        var(--border) = #e0e0e0 in light, #2a2a4a in dark.
+        Border color automatically changes with theme.
+      */
+      transition: border-color var(--transition);
+    }
+
+    .header__title { font-size: 1.25rem; }
+
+    /*
+      THEME TOGGLE BUTTON
+
+      background: var(--bg-secondary)
+      → light gray in light mode, dark blue in dark mode.
+
+      cursor: pointer → shows hand cursor on hover.
+      border: 1px solid var(--border) → border matches theme.
+    */
+    .theme-toggle {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background var(--transition), color var(--transition),
+                  border-color var(--transition);
+    }
+
+    .theme-toggle:hover {
+      background: var(--bg-accent);
+      color: var(--text-on-accent);
+    }
+
+
+    /* ===== MAIN CONTENT ===== */
+    .main { padding: 2rem; max-width: 800px; margin: 0 auto; }
+
+
+    /* ===== CARD =====
+
+       All visual properties use variables.
+       The card has NO idea what theme is active.
+       It just says "use --bg-secondary" and the theme decides what that is.
+
+       This is the power of CSS variables:
+       Components are theme-agnostic.
+    */
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: background var(--transition), border-color var(--transition),
+                  box-shadow var(--transition);
+    }
+
+    .card__title {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card__text {
+      color: var(--text-secondary);
+      /*
+        --text-secondary = #666 in light, #a0a0a0 in dark.
+        Lighter text for less important content.
+        Automatically adjusts per theme.
+      */
+      font-size: 0.9rem;
+    }
+
+
+    /* ===== ACCENT BUTTON ===== */
+    .btn-accent {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.5rem 1.25rem;
+      background: var(--bg-accent);
+      color: var(--text-on-accent);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: opacity var(--transition);
+    }
+
+    .btn-accent:hover { opacity: 0.85; }
+
+
+    /* ===== COLOR SWATCH (shows current variable values) ===== */
+    .swatches {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .swatch {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 0.25rem;
+      font-size: 0.6rem;
+      color: var(--text-secondary);
+      transition: background var(--transition);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <span class="header__title">Theme Demo</span>
+
+    <!--
+      onclick toggles .dark class on <html> (documentElement).
+      When .dark is added, all CSS variables switch to dark values.
+      When removed, they revert to :root (light) values.
+    -->
+    <button class="theme-toggle"
+      onclick="document.documentElement.classList.toggle('dark');
+               this.textContent = document.documentElement.classList.contains('dark') ? 'Light Mode' : 'Dark Mode'">
+      Dark Mode
+    </button>
+  </header>
+
+  <main class="main">
+    <div class="card">
+      <h2 class="card__title">How This Works</h2>
+      <p class="card__text">
+        All colors are CSS variables defined on :root (light) and .dark (dark).
+        Clicking the toggle adds/removes .dark class on &lt;html&gt;.
+        Every var() reference instantly updates. Zero component CSS changes.
+      </p>
+      <button class="btn-accent">Primary Action</button>
+    </div>
+
+    <div class="card">
+      <h2 class="card__title">Current Theme Colors</h2>
+      <p class="card__text">These swatches show the active variable values:</p>
+      <div class="swatches">
+        <div class="swatch" style="background: var(--bg-primary);">bg-1</div>
+        <div class="swatch" style="background: var(--bg-secondary);">bg-2</div>
+        <div class="swatch" style="background: var(--bg-accent);">accent</div>
+        <div class="swatch" style="background: var(--text-primary);">text-1</div>
+        <div class="swatch" style="background: var(--text-secondary);">text-2</div>
+        <div class="swatch" style="background: var(--border);">border</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card__title">Variable Scoping</h2>
+      <p class="card__text">
+        Variables cascade downward. :root is global.
+        You can override on any element — children inherit the override.
+        This card uses global variables, but you could scope locally too.
+      </p>
+    </div>
+  </main>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+/* ============================================================
+   TRANSITIONS & ANIMATIONS — DO's and DON'Ts
+   ============================================================ */
+
+
+/* ❌ DON'T: Animate width, height, margin, top, left */
+.box { transition: width 0.3s; }
+.box:hover { width: 300px; }
+/* Triggers REFLOW — browser recalculates layout of entire page.
+   Causes jank (stuttering) at 60fps. */
+
+/* ✅ DO: Animate transform and opacity only */
+.box { transition: transform 0.3s; }
+.box:hover { transform: scaleX(1.5); }
+/* GPU-accelerated. No reflow. Smooth 60fps. */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use transition: all */
+.card { transition: all 0.3s ease; }
+/* Animates EVERY property that changes — even ones you didn't intend.
+   Performance cost + unexpected visual changes. */
+
+/* ✅ DO: List specific properties */
+.card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use very long durations */
+.modal { transition: opacity 2s ease; }
+/* 2 seconds feels sluggish. Users get impatient. */
+
+/* ✅ DO: Keep transitions 150-400ms */
+.modal { transition: opacity 0.2s ease; }
+/* 200ms feels responsive. 300ms for larger movements. */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Put transition on :hover only */
+.button:hover {
+  background: blue;
+  transition: background 0.3s ease;
+}
+/* Only animates IN (hover on). Snaps back instantly on hover off. */
+
+/* ✅ DO: Put transition on the base state */
+.button {
+  background: gray;
+  transition: background 0.3s ease;
+}
+.button:hover { background: blue; }
+/* Now it animates BOTH ways — hover in AND hover out. */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Forget animation-fill-mode */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.element { animation: fadeIn 0.5s ease; }
+/* After animation: element SNAPS BACK to opacity:0 (original state). */
+
+/* ✅ DO: Use forwards to keep the final state */
+.element { animation: fadeIn 0.5s ease forwards; }
+/* After animation: element STAYS at opacity: 1. */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Ignore prefers-reduced-motion */
+/* Some users get motion sickness from animations */
+
+/* ✅ DO: Always include this */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use will-change on everything */
+* { will-change: transform; }
+/* Creates compositing layers for EVERY element. Huge memory usage. */
+
+/* ✅ DO: Use will-change only on elements that WILL animate */
+.card-that-animates { will-change: transform; }
+/* And remove it when animation is done if possible. */

@@ -1,0 +1,136 @@
+<!-- ============================================================
+     MINI PROJECT: Profile Card
+     SKILLS PRACTICED: box model, display types, margin/padding
+     ============================================================ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Card — Box Model Project</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* CARD — block element with box model */
+    .profile {
+      display: block;            /* default, shown for clarity */
+      background: white;
+      width: 320px;
+      padding: 2rem;             /* padding INSIDE the border */
+      border: 1px solid #e0e0e0; /* border is part of total width (border-box) */
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    /* AVATAR — block with margin auto for centering */
+    .profile__avatar {
+      display: block;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1rem;      /* auto left/right = horizontal center */
+      border-radius: 50%;        /* circle */
+      background: #007bff;
+      /* In real app: background-image */
+    }
+
+    /* NAME — block element, margin creates space below */
+    .profile__name {
+      display: block;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;    /* margin OUTSIDE — pushes next element away */
+    }
+
+    /* ROLE — block, lighter text */
+    .profile__role {
+      display: block;
+      color: #888;
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* STATS ROW — inline-block items side by side */
+    .profile__stats {
+      border-top: 1px solid #eee;
+      padding-top: 1.5rem;       /* padding inside, creates gap from border */
+    }
+
+    .profile__stat {
+      display: inline-block;     /* side by side + can set width */
+      width: 30%;                /* 3 items × ~30% */
+      text-align: center;
+    }
+
+    .profile__stat-number {
+      display: block;            /* block inside inline-block = stacks vertically */
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .profile__stat-label {
+      display: block;
+      font-size: 0.75rem;
+      color: #999;
+      text-transform: uppercase;
+    }
+
+    /* BUTTON — inline-block for sizing + inline placement */
+    .profile__button {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 0.6rem 2rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+
+    /* visibility: hidden vs display: none demo */
+    .profile__hidden-visible {
+      visibility: hidden;
+      /* This text is invisible but STILL takes space in layout */
+      /* Change to display: none — the space will collapse */
+    }
+  </style>
+</head>
+<body>
+
+  <div class="profile">
+    <div class="profile__avatar"></div>
+    <span class="profile__name">Surya Dev</span>
+    <span class="profile__role">Frontend Developer</span>
+
+    <div class="profile__stats">
+      <div class="profile__stat">
+        <span class="profile__stat-number">128</span>
+        <span class="profile__stat-label">Posts</span>
+      </div>
+      <div class="profile__stat">
+        <span class="profile__stat-number">2.4k</span>
+        <span class="profile__stat-label">Followers</span>
+      </div>
+      <div class="profile__stat">
+        <span class="profile__stat-number">384</span>
+        <span class="profile__stat-label">Following</span>
+      </div>
+    </div>
+
+    <button class="profile__button">Follow</button>
+
+    <p class="profile__hidden-visible">I take space but I'm invisible!</p>
+  </div>
+
+</body>
+</html>

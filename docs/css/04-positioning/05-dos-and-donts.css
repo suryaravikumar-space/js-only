@@ -1,0 +1,81 @@
+/* ============================================================
+   POSITIONING — DO's and DON'Ts
+   ============================================================ */
+
+
+/* ❌ DON'T: Use absolute without a positioned parent */
+.child { position: absolute; top: 0; left: 0; }
+/* Positions relative to <html> — probably not what you want */
+
+/* ✅ DO: Always set position: relative on the parent */
+.parent { position: relative; }
+.child  { position: absolute; top: 0; left: 0; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use position: absolute for layout */
+.sidebar { position: absolute; left: 0; width: 250px; }
+.main    { position: absolute; left: 250px; right: 0; }
+/* Fragile, doesn't respond to content changes */
+
+/* ✅ DO: Use flexbox or grid for layout */
+.layout  { display: flex; }
+.sidebar { width: 250px; flex-shrink: 0; }
+.main    { flex: 1; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use random large z-index values */
+.modal   { z-index: 999999; }
+.tooltip { z-index: 9999999; }
+/* z-index arms race — impossible to maintain */
+
+/* ✅ DO: Use a structured z-index scale */
+/* --z-dropdown: 100;
+   --z-sticky: 200;
+   --z-modal-bg: 400;
+   --z-modal: 500;
+   --z-tooltip: 600; */
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Use fixed without accounting for content behind it */
+.navbar { position: fixed; top: 0; }
+/* Content hides behind the navbar */
+
+/* ✅ DO: Add padding to body to compensate */
+.navbar { position: fixed; top: 0; height: 60px; }
+body    { padding-top: 60px; }
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Center with absolute using calc or magic numbers */
+.centered { position: absolute; left: 45%; top: 40%; }
+/* Guessing values — won't actually center */
+
+/* ✅ DO: Use the translate trick */
+.centered {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+/* ──────────────────────────────────────────────────────────── */
+
+
+/* ❌ DON'T: Forget sticky requirements */
+.sticky { position: sticky; }
+/* Missing top value → won't stick */
+/* Parent has overflow: hidden → won't stick */
+
+/* ✅ DO: Always set offset + check parent overflow */
+.sticky { position: sticky; top: 0; }

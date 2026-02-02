@@ -1,0 +1,85 @@
+/* ============================================================
+   FLEXBOX — INTERVIEW QUESTIONS
+   ============================================================ */
+
+
+/* Q1: What is the difference between justify-content and align-items?
+   ──────────────────────────────────────────────────────────────
+   justify-content → aligns along MAIN axis (default: horizontal)
+   align-items     → aligns along CROSS axis (default: vertical)
+
+   If flex-direction: column, they SWAP:
+   justify-content → vertical
+   align-items     → horizontal
+*/
+
+
+/* Q2: How do you center a div both horizontally and vertically?
+   ────────────────────────────────────────────────────────────── */
+.parent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* parent needs a height */
+}
+
+
+/* Q3: What is the difference between flex-grow, flex-shrink, flex-basis?
+   ──────────────────────────────────────────────────────────────
+   flex-basis:  starting size before any growing/shrinking
+   flex-grow:   how much to GROW when extra space exists (0 = don't)
+   flex-shrink: how much to SHRINK when space is tight (0 = don't)
+
+   flex: 1 → shorthand for flex: 1 1 0% (grow equally from 0)
+*/
+
+
+/* Q4: What does flex: 1 actually mean?
+   ──────────────────────────────────────────────────────────────
+   flex: 1 = flex-grow: 1, flex-shrink: 1, flex-basis: 0%
+   Item starts at 0 width, then grows to fill available space equally.
+*/
+
+
+/* Q5: What is the difference between flex-wrap and overflow?
+   ──────────────────────────────────────────────────────────────
+   flex-wrap: wrap → items move to NEXT LINE if they don't fit.
+   overflow: hidden/scroll → items stay in one line, overflow is hidden/scrollable.
+*/
+
+
+/* Q6: What is the difference between align-items and align-content?
+   ──────────────────────────────────────────────────────────────
+   align-items:   aligns items within a SINGLE row/line
+   align-content: aligns the ROWS themselves (needs flex-wrap: wrap + multiple lines)
+*/
+
+
+/* Q7: Can flexbox do 2D layouts?
+   ──────────────────────────────────────────────────────────────
+   NO. Flexbox is 1-dimensional (row OR column).
+   For 2D layouts (rows AND columns), use CSS Grid.
+   Flexbox + wrap can look 2D but items don't align across rows.
+*/
+
+
+/* Q8: How do you make one item stick to the right in a flex row?
+   ────────────────────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  align-items: center;
+}
+.nav .logo { /* first item */ }
+.nav .login {
+  margin-left: auto;  /* pushes this item to the far right */
+}
+
+
+/* Q9: What is the gap property? Is it better than margin?
+   ──────────────────────────────────────────────────────────────
+   gap adds space BETWEEN items only (not on edges).
+   Better than margin because:
+   - No double margins between items
+   - No need to remove margin from first/last child
+   - Works with flex and grid
+*/

@@ -1,0 +1,101 @@
+/* ============================================================
+   CSS GRID — Container Properties (Parent)
+   ============================================================
+
+   Grid = 2-dimensional layout (rows AND columns).
+   Flexbox = 1D (row or column). Grid = 2D (both at once).
+
+   TERMINOLOGY:
+   - Grid Container: the parent with display: grid
+   - Grid Item: direct children
+   - Grid Line: lines that divide the grid
+   - Grid Track: a row or column
+   - Grid Cell: intersection of a row and column
+   - Grid Area: a rectangular group of cells
+
+   ┌─────┬─────┬─────┐
+   │  1  │  2  │  3  │  ← Row 1 (track)
+   ├─────┼─────┼─────┤
+   │  4  │  5  │  6  │  ← Row 2
+   ├─────┼─────┼─────┤
+   │  7  │  8  │  9  │  ← Row 3
+   └─────┴─────┴─────┘
+   ^     ^     ^     ^
+   Line1 Line2 Line3 Line4
+
+   ============================================================ */
+
+
+/* Step 1: Enable grid */
+.container {
+  display: grid;
+}
+
+
+/* --- grid-template-columns ---
+   Defines the NUMBER and SIZE of columns.
+*/
+
+.grid-fixed {
+  display: grid;
+  grid-template-columns: 200px 200px 200px;  /* 3 columns, 200px each */
+}
+
+/* fr unit = fraction of remaining space */
+.grid-fr {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;       /* 3 equal columns */
+}
+
+.grid-mixed {
+  display: grid;
+  grid-template-columns: 250px 1fr 1fr;     /* sidebar + 2 equal columns */
+}
+
+
+/* --- repeat() shorthand --- */
+.grid-repeat {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);     /* same as: 1fr 1fr 1fr */
+  grid-template-columns: repeat(4, 200px);   /* same as: 200px 200px 200px 200px */
+}
+
+
+/* --- grid-template-rows --- */
+.grid-rows {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 80px 1fr 60px;         /* header, content, footer */
+}
+
+
+/* --- gap --- */
+.grid-gap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;                    /* 16px between all rows and columns */
+  /* or: row-gap: 16px; column-gap: 8px; */
+}
+
+
+/* --- auto-fill & auto-fit (RESPONSIVE without media queries!) ---
+   The most powerful Grid feature.
+*/
+
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  /* Creates as many 250px+ columns as fit.
+     auto-fill: keeps empty columns (leaves space)
+     auto-fit:  collapses empty columns (items stretch to fill) */
+}
+
+/* auto-fit is usually what you want: */
+.grid-autofit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  /* Cards are at least 300px, grow to fill, wrap automatically.
+     No media queries needed! */
+}
